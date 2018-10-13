@@ -227,7 +227,7 @@ describe('cross chain testing', () => {
   it('ETH to ETC: Fake export receipt, should pass on-chain validation and fail on off-chain validation', () => {
     return new Promise(async (resolve, reject) => {
       // Buy some MET
-      await eth.web3.eth.sendTransaction({to: eth.contracts.auctions.address, from: ethBuyer1, value: 2e16})
+      await eth.web3.eth.sendTransaction({ to: eth.contracts.auctions.address, from: ethBuyer1, value: 2e16 })
       let metBalance = eth.contracts.metToken.balanceOf(ethBuyer1)
       assert(metBalance > 0, 'Exporter has no MET token balance')
       let fee = Math.floor(metBalance.div(2))
@@ -285,26 +285,22 @@ describe('cross chain testing', () => {
       if (receipt.status === '0x0') {
         reject(new Error('importMET function reverted'))
       }
-      let filter = etc.contracts.validator
-        .LogAttestation()
-        .watch((err, response) => {
-          if (err) {
-            console.log('Attestation error', err)
-          } else {
-            if (logData.currentBurnHash === response.args.hash) {
-              assert.isFalse(response.args.isValid)
-              filter.stopWatching()
-              resolve()
-            }
-          }
-        })
+      let filter = etc.contracts.validator.LogAttestation().watch((err, response) => {
+        if (err) {
+          console.log('Attestation error', err)
+        } else if (logData.currentBurnHash === response.args.hash) {
+          assert.isFalse(response.args.isValid)
+          filter.stopWatching()
+        }
+      })
+      resolve()
     })
   })
 
   it('ETH to ETC: import should fail as provided fee is less than defined fee', () => {
     return new Promise(async (resolve, reject) => {
       // Buy some MET
-      await eth.web3.eth.sendTransaction({to: eth.contracts.auctions.address, from: ethBuyer1, value: 2e16})
+      await eth.web3.eth.sendTransaction({ to: eth.contracts.auctions.address, from: ethBuyer1, value: 2e16 })
       let metBalance = eth.contracts.metToken.balanceOf(ethBuyer1)
       let fee = 10 // 10 wei MET
       let amount = metBalance.sub(fee)
@@ -322,62 +318,4 @@ describe('cross chain testing', () => {
       resolve()
     })
   })
-
-  // it('ETH to ETC: import should fail as provided fee is less than defined fee', () => {
-  //   return new Promise(async (resolve, reject) => {
-
-  //     // Buy some MET
-  //     await eth.web3.eth.sendTransaction({to: eth.contracts.auctions.address, from: ethBuyer1, value: 2e16})
-  //     let metBalance = eth.contracts.metToken.balanceOf(ethBuyer1)
-  //     let fee = Math.floor(metBalance.div(2))
-  //     let amount = metBalance.sub(fee)
-  //     assert(metBalance, amount.add(fee), 'Total of amount and fee should be equal to metBalance')
-
-  //     let extraData = 'D'
-  //     let totalSupplybefore = await eth.contracts.metToken.totalSupply()
-  //     let tx = await eth.contracts.metToken.export(
-  //       eth.web3.fromAscii('ETC'),
-  //       etc.contracts.metToken.address,
-  //       etcBuyer1,
-  //       amount.valueOf(),
-  //       fee.valueOf(),
-  //       eth.web3.fromAscii(extraData),
-  //       { from: ethBuyer1 }
-  //     )
-  //     let receipt = eth.web3.eth.getTransactionReceipt(tx)
-  //     let importDataObj = await util.prepareImportData(eth, receipt)
-  //     let expectedTotalSupply = etc.contracts.metToken.totalSupply().add(amount).add(fee)
-
-  //     let expectedBalanceOfRecepient = etc.contracts.metToken.balanceOf(etcBuyer1).add(amount)
-  //     let balanceOfValidatorBefore = etc.contracts.metToken.balanceOf(etc.configuration.address)
-  //     tx = await etc.contracts.metToken.importMET(
-  //       etc.web3.fromAscii('ETH'),
-  //       importDataObj.destinationChain,
-  //       importDataObj.addresses,
-  //       importDataObj.extraData,
-  //       importDataObj.burnHashes,
-  //       importDataObj.supplyOnAllChains,
-  //       importDataObj.importData,
-  //       importDataObj.root,
-  //       { from: etcBuyer1 }
-  //     )
-  //     receipt = etc.web3.eth.getTransactionReceipt(tx)
-  //     if (receipt.status === '0x0') {
-  //       reject(new Error('importMET function reverted'))
-  //     }
-  //     // wait for minting to happen
-  //     let filter = etc.contracts.tokenPorter.LogImport().watch((err, response) => {
-  //       if (err) {
-  //         console.log('export error', err)
-  //       } else {
-  //         if (importDataObj.burnHashes[1] === response.args.currentHash) {
-  //           filter.stopWatching()
-  //           validateMinting(etc, etcBuyer1, expectedTotalSupply, expectedBalanceOfRecepient,
-  //             fee, balanceOfValidatorBefore)
-  //           resolve()
-  //         }
-  //       }
-  //     })
-  //   })
-  // })
 })

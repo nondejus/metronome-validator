@@ -42,20 +42,19 @@ function initContracts () {
 function setupAccount (web3) {
   let user = web3.personal.newAccount('password')
   web3.personal.unlockAccount(web3.eth.accounts[0], '')
-  web3.eth.sendTransaction({to: user, from: web3.eth.accounts[0], value: 2e18})
+  web3.eth.sendTransaction({ to: user, from: web3.eth.accounts[0], value: 2e18 })
   return user
 }
 
 // Configure chain: Add destination chain and add validators
 function configureChain (chain, destChain) {
   let destinationChain = chain.contracts.tokenPorter.destinationChains(destChain.name)
-  console.log('destinationChain=', destinationChain)
   if (destinationChain === '0x0000000000000000000000000000000000000000') {
     let owner = chain.contracts.tokenPorter.owner()
+    chain.web3.personal.unlockAccount(owner, 'newOwner')
     var destTokanAddress = destChain.contracts.metToken.address
-    chain.contracts.tokenPorter.addDestinationChain(destChain.name, destTokanAddress, {from: owner})
+    chain.contracts.tokenPorter.addDestinationChain(destChain.name, destTokanAddress, { from: owner })
   }
-  
 }
 
 // Prepare import data using export receipt
@@ -112,4 +111,4 @@ function getMerkleRoot (hashes) {
   return '0x' + tree.getRoot().toString('hex')
 }
 
-module.exports = {initContracts, prepareImportData}
+module.exports = { initContracts, prepareImportData }
