@@ -77,6 +77,12 @@ while [ "$1" != "" ]; do
       TEST=1
       LOCAL=0
       ;;
+    --devnet )
+      LIVE=0
+      TEST=0
+      LOCAL=1
+      DEVNET=1
+      ;;
     -h | --help )           usage
       exit
       ;;  
@@ -106,10 +112,14 @@ then
      #CHAINARG="--chain $ETH_TEST_PARITYSPEC"
      CHAINARG="--chain dev"
      BOOTNODES="--bootnodes $ETH_TEST_BOOTNODE"
+  elif [[ $DEVNET = 1 ]]
+  then
+     DATADIR=./parity/devnet/eth
+     DEST="New Alchemy ETH devnet"
+     BOOTNODES="--bootnodes enode://fa2ffb624f7ade1f432e0a37249b201817bffd597913b7bcde2db93618d7604f68c74fa51e3700e2888a295a80591d03d5d013180866a50c3758cade3b2e92e9@35.227.101.52:33333"
   else
     DATADIR=/tmp/parity/local/eth
     DEST="Parity DevChain Local ETH"
-    BOOTNODES="--bootnodes $ETH_TEST_BOOTNODE"
   fi
 elif [[ "$CHAIN" = "etc" ]]
 then
@@ -127,10 +137,14 @@ then
      #CHAINARG="--chain $ETC_TEST_PARITYSPEC"
      CHAINARG="--chain dev"
      BOOTNODES="--bootnodes $ETC_TEST_BOOTNODE"
+  elif [[ $DEVNET = 1 ]]
+  then
+     DATADIR=./parity/devnet/etc
+     DEST="New Alchemy ETC devnet"
+     BOOTNODES="--bootnodes enode://b4035a5527d17d588d576c4cfcb3c39d7e308fc4c2fc5720813e21770decd17de3a93602ac4b36422964b479cabb82dfb1dc6c5cfedd4061954dfdbfbc309a6a@35.227.101.52:30303"
     else
      DATADIR=/tmp/parity/local/etc
      DEST="New Alchemy ETC Local"
-     BOOTNODES="--bootnodes $ETC_TEST_BOOTNODE"
   fi
 fi
 
@@ -179,5 +193,5 @@ fi
 
 
 PRELOAD="--preload $ABI_DIR/metronome.js"
-geth --exec 'eth.blockNumber' attach $PARITY_URL $PRELOAD
+geth attach $PARITY_URL $PRELOAD
 exit 0
