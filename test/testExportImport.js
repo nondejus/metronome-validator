@@ -78,11 +78,12 @@ describe('cross chain testing', () => {
       let feePerTenThousand = 1
 
       // Buy some MET
-      await eth.web3.eth.sendTransaction({
+      let tx = await eth.web3.eth.sendTransaction({
         to: eth.contracts.auctions.address,
         from: ethBuyer1,
         value: 2e16
       })
+      util.waitForTx(tx, eth.web3.eth)
       let metBalance = eth.contracts.metToken.balanceOf(ethBuyer1)
       assert(metBalance > 0, 'Exporter has no MET token balance')
 
@@ -95,7 +96,7 @@ describe('cross chain testing', () => {
 
       let extraData = 'D'
       let totalSupplybefore = await eth.contracts.metToken.totalSupply()
-      let tx = await eth.contracts.metToken.export(
+      tx = await eth.contracts.metToken.export(
         eth.web3.fromAscii('ETC'),
         etc.contracts.metToken.address,
         etcBuyer1,
@@ -104,6 +105,7 @@ describe('cross chain testing', () => {
         eth.web3.fromAscii(extraData),
         { from: ethBuyer1 }
       )
+      util.waitForTx(tx, eth.web3.eth)
       let receipt = eth.web3.eth.getTransactionReceipt(tx)
       if (receipt.status === '0x0') {
         reject(new Error('Export function reverted'))
@@ -127,6 +129,7 @@ describe('cross chain testing', () => {
         importDataObj.root,
         { from: etcBuyer1 }
       )
+      util.waitForTx(tx, etc.web3.eth)
       receipt = etc.web3.eth.getTransactionReceipt(tx)
       if (receipt.status === '0x0') {
         reject(new Error('importMET function reverted'))
@@ -164,6 +167,7 @@ describe('cross chain testing', () => {
         etc.web3.fromAscii(extraData),
         { from: etcBuyer1 }
       )
+      util.waitForTx(tx, etc.web3.eth)
       let receipt = etc.web3.eth.getTransactionReceipt(tx)
       if (receipt.status === '0x0') {
         reject(new Error('Export function reverted'))
@@ -197,6 +201,7 @@ describe('cross chain testing', () => {
         importDataObj.root,
         { from: ethBuyer1 }
       )
+      util.waitForTx(tx, eth.web3.eth)
       receipt = eth.web3.eth.getTransactionReceipt(tx)
       if (receipt.status === '0x0') {
         reject(new Error('importMET function reverted'))
@@ -227,14 +232,15 @@ describe('cross chain testing', () => {
   it('ETH to ETC: Fake export receipt, should pass on-chain validation and fail on off-chain validation', () => {
     return new Promise(async (resolve, reject) => {
       // Buy some MET
-      await eth.web3.eth.sendTransaction({ to: eth.contracts.auctions.address, from: ethBuyer1, value: 2e16 })
+      let tx = await eth.web3.eth.sendTransaction({ to: eth.contracts.auctions.address, from: ethBuyer1, value: 2e16 })
+      util.waitForTx(tx, eth.web3.eth)
       let metBalance = eth.contracts.metToken.balanceOf(ethBuyer1)
       assert(metBalance > 0, 'Exporter has no MET token balance')
       let fee = Math.floor(metBalance.div(2))
       let amount = metBalance.sub(fee)
       let extraData = 'D'
       let totalSupplybefore = await eth.contracts.metToken.totalSupply()
-      let tx = await eth.contracts.metToken.export(
+      tx = await eth.contracts.metToken.export(
         eth.web3.fromAscii('ETC'),
         etc.contracts.metToken.address,
         etcBuyer1,
@@ -242,6 +248,7 @@ describe('cross chain testing', () => {
         fee.valueOf(),
         eth.web3.fromAscii(extraData),
         { from: ethBuyer1 })
+      util.waitForTx(tx, eth.web3.eth)
       let receipt = eth.web3.eth.getTransactionReceipt(tx)
       if (receipt.status === '0x0') {
         reject(new Error('export function reverted'))
@@ -279,6 +286,7 @@ describe('cross chain testing', () => {
         importDataJson.root,
         { from: etcBuyer1 }
       )
+      util.waitForTx(tx, etc.web3.eth)
       receipt = etc.web3.eth.getTransactionReceipt(tx)
       decoder = ethjsABI.logDecoder(etc.contracts.tokenPorter.abi)
       let logData = decoder(receipt.logs)[0]
@@ -300,7 +308,8 @@ describe('cross chain testing', () => {
   it('ETH to ETC: import should fail as provided fee is less than defined fee', () => {
     return new Promise(async (resolve, reject) => {
       // Buy some MET
-      await eth.web3.eth.sendTransaction({ to: eth.contracts.auctions.address, from: ethBuyer1, value: 2e16 })
+      let tx = await eth.web3.eth.sendTransaction({ to: eth.contracts.auctions.address, from: ethBuyer1, value: 2e16 })
+      util.waitForTx(tx, eth.web3.eth)
       let metBalance = eth.contracts.metToken.balanceOf(ethBuyer1)
       let fee = 10 // 10 wei MET
       let amount = metBalance.sub(fee)

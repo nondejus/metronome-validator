@@ -5,6 +5,15 @@ const reader = require('../lib/file-reader')
 const parser = require('../lib/parser')
 const Chain = require('../lib/chain')
 
+var hash
+function waitForTx (hash, eth) {
+  var receipt = eth.getTransactionReceipt(hash)
+  while (receipt === null) {
+    receipt = eth.getTransactionReceipt(hash)
+  }
+  return receipt
+}
+
 // create contract object from abi
 function initContracts () {
   return new Promise(async (resolve, reject) => {
@@ -22,11 +31,11 @@ function initContracts () {
     etcChain = new Chain(configuration.etc, metronomeContracts.etc)
 
     // ETH setup and init
-    ethBuyer = setupAccount(ethChain.web3)
+    ethBuyer = await setupAccount(ethChain.web3)
     configureChain(ethChain, etcChain)
 
     // ETC setup and init
-    etcBuyer = setupAccount(etcChain.web3)
+    etcBuyer = await setupAccount(etcChain.web3)
     configureChain(etcChain, ethChain)
 
     resolve({
@@ -39,10 +48,14 @@ function initContracts () {
 }
 
 // Create account and send some ether in it
-function setupAccount (web3) {
-  let user = web3.personal.newAccount('password')
-  web3.personal.unlockAccount(web3.eth.accounts[0], '')
-  web3.eth.sendTransaction({ to: user, from: web3.eth.accounts[0], value: 2e18 })
+async function setupAccount (web3) {
+  let user = await web3.personal.newAccount('password')
+  console.log('new user=', user)
+  let tx = await web3.personal.unlockAccount(web3.eth.accounts[0], '')
+  tx = await web3.eth.sendTransaction({ to: user, from: web3.eth.accounts[0], value: 2e17 })
+  waitForTx(tx, web3.eth)
+  let balance = await web3.eth.getBalance(user)
+  console.log('balance=', balance)
   return user
 }
 
@@ -53,7 +66,8 @@ function configureChain (chain, destChain) {
     let owner = chain.contracts.tokenPorter.owner()
     chain.web3.personal.unlockAccount(owner, 'newOwner')
     var destTokanAddress = destChain.contracts.metToken.address
-    chain.contracts.tokenPorter.addDestinationChain(destChain.name, destTokanAddress, { from: owner })
+    let tx = chain.contracts.tokenPorter.addDestinationChain(destChain.name, destTokanAddress, { from: owner })
+    waitForTx(tx, chain.web3.eth)
   }
 }
 
@@ -111,4 +125,4 @@ function getMerkleRoot (hashes) {
   return '0x' + tree.getRoot().toString('hex')
 }
 
-module.exports = { initContracts, prepareImportData }
+module.exports = { initContracts, prepareImportData, waitForTx }
