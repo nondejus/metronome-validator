@@ -4,8 +4,8 @@ const crypto = require('crypto')
 const reader = require('../lib/file-reader')
 const parser = require('../lib/parser')
 const Chain = require('../lib/chain')
+const config = require('config')
 
-var hash
 function waitForTx (hash, eth) {
   var receipt = eth.getTransactionReceipt(hash)
   while (receipt === null) {
@@ -19,16 +19,15 @@ function initContracts () {
   return new Promise(async (resolve, reject) => {
     let ethChain, etcChain, ethBuyer, etcBuyer
 
-    let configuration = reader.readFileAsJson('./config.json')
-    configuration.eth.password = ''
-    configuration.etc.password = ''
+    config.eth.password = ''
+    config.etc.password = ''
 
     let metronome = reader.readMetronome()
     let metronomeContracts = parser.parseMetronome(metronome)
 
     // create chain object to get contracts
-    ethChain = new Chain(configuration.eth, metronomeContracts.eth)
-    etcChain = new Chain(configuration.etc, metronomeContracts.etc)
+    ethChain = new Chain(config.eth, metronomeContracts.eth)
+    etcChain = new Chain(config.etc, metronomeContracts.etc)
 
     // ETH setup and init
     ethBuyer = await setupAccount(ethChain.web3)
@@ -50,7 +49,6 @@ function initContracts () {
 // Create account and send some ether in it
 async function setupAccount (web3) {
   let user = await web3.personal.newAccount('password')
-  console.log('new user=', user)
   let tx = await web3.personal.unlockAccount(web3.eth.accounts[0], '')
   tx = await web3.eth.sendTransaction({ to: user, from: web3.eth.accounts[0], value: 2e17 })
   waitForTx(tx, web3.eth)
@@ -62,13 +60,15 @@ async function setupAccount (web3) {
 // Configure chain: Add destination chain and add validators
 function configureChain (chain, destChain) {
   let destinationChain = chain.contracts.tokenPorter.destinationChains(destChain.name)
+  let owner = chain.contracts.tokenPorter.owner()
   if (destinationChain === '0x0000000000000000000000000000000000000000') {
-    let owner = chain.contracts.tokenPorter.owner()
     chain.web3.personal.unlockAccount(owner, 'newOwner')
     var destTokanAddress = destChain.contracts.metToken.address
-    let tx = chain.contracts.tokenPorter.addDestinationChain(destChain.name, destTokanAddress, { from: owner })
+    var tx = chain.contracts.tokenPorter.addDestinationChain(destChain.name, destTokanAddress, { from: owner })
     waitForTx(tx, chain.web3.eth)
   }
+  tx = chain.contracts.validator.updateThreshold(1, { from: owner })
+  waitForTx(tx, chain.web3.eth)
 }
 
 // Prepare import data using export receipt

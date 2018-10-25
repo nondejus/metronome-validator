@@ -24,18 +24,13 @@
 */
 
 const program = require('commander')
-const fs = require('fs')
 const process = require('process')
 const logger = require('./lib/logger')(__filename)
 const reader = require('./lib/file-reader')
 const launcher = require('./lib/launcher')
+const config = require('config')
 
 function init () {
-  program
-    .command('init-config')
-    .description('Create sample configuration file for validator in current directory')
-    .action(writeSampleConfigFile)
-
   program
     .option('-d, --dev', 'Run app in dev environment (without passwords)')
     .command('launch')
@@ -50,41 +45,14 @@ function init () {
 }
 
 function launchValidator (ethPassword, etcPassword) {
-  const config = reader.readFileAsJson('config.json')
+  if (config.newRelic.licenseKey) {
+    require('newrelic')
+  }
   config.eth.password = processArgument(ethPassword)
   config.etc.password = processArgument(etcPassword)
 
   const metronome = reader.readMetronome()
   launcher.launch(config, metronome)
-}
-
-function writeSampleConfigFile () {
-  logger.info('writing sample config file')
-  const configPath = 'config.json'
-  const sampleConfig = [
-    '{                                              ',
-    '    "eth": {                                   ',
-    '       "chainName":"ETH",                      ',
-    '       "nodeUrl": "http://localhost:8545",     ',
-    '        "address": "0x0",                      ',
-    '        "password": "password"                 ',
-    '    },                                         ',
-    '    "etc": {                                   ',
-    '       "chainName":"ETC",                      ',
-    '       "nodeUrl": "http://localhost:8555",     ',
-    '        "address": "0x0",                      ',
-    '        "password": "password"                 ',
-    '    }                                          ',
-    '}                                              '
-  ]
-
-  if (!fs.existsSync(configPath)) {
-    fs.writeFileSync(configPath, sampleConfig.join('\n'))
-
-    logger.info('Sample Configuration file created!')
-  } else {
-    logger.info('Configuration file already exists')
-  }
 }
 
 function processArgument (argument) {
