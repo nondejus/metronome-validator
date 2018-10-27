@@ -7,11 +7,11 @@ const Chain = require('../lib/chain')
 const config = require('config')
 const ethers = require('ethers')
 
-function waitForTx (hash, eth) {
-  var receipt = eth.getTransactionReceipt(hash)
-  while (receipt === null) {
-    receipt = eth.getTransactionReceipt(hash)
-  }
+async function waitForTx (hash, eth) {
+  var receipt = await eth.getTransactionReceipt(hash.transactionHash)
+  // while (receipt === null) {
+  //   receipt = eth.getTransactionReceipt(hash)
+  // }
   return receipt
 }
 
@@ -49,9 +49,10 @@ function initContracts () {
 
 // Create account and send some ether in it
 async function setupAccount (web3) {
-  let user = await web3.personal.newAccount('password')
-  let tx = await web3.personal.unlockAccount(web3.eth.accounts[0], '')
-  tx = await web3.eth.sendTransaction({ to: user, from: web3.eth.accounts[0], value: 2e17 })
+  let accounts = await web3.eth.getAccounts()
+  let user = await web3.eth.personal.newAccount('password')
+  let tx = await web3.eth.personal.unlockAccount(accounts[0], '')
+  tx = await web3.eth.sendTransaction({ to: user, from: accounts[0], value: 2e17 })
   waitForTx(tx, web3.eth)
   return user
 }
@@ -97,16 +98,17 @@ async function getMET (chain, recepient) {
   metBalance = await chain.contracts.metToken.balanceOf(recepient)
 }
 // Configure chain: Add destination chain and add validators
-function configureChain (chain, destChain) {
-  let destinationChain = chain.contracts.tokenPorter.destinationChains(destChain.name)
-  let owner = chain.contracts.tokenPorter.owner()
-  chain.web3.personal.unlockAccount(owner, '')
+async function configureChain (chain, destChain) {
+  let destChainName = chain.web3.utils.toHex(destChain.name)
+  let destinationChain = await chain.contracts.tokenPorter.methods.destinationChains(destChainName).call()
+  let owner = await chain.contracts.tokenPorter.methods.owner().call()
   if (destinationChain === '0x0000000000000000000000000000000000000000') {
-    var destTokanAddress = destChain.contracts.metToken.address
-    var tx = chain.contracts.tokenPorter.addDestinationChain(destChain.name, destTokanAddress, { from: owner })
+    await chain.web3.eth.personal.unlockAccount(owner, 'newOwner')
+    var destTokanAddress = destChain.contracts.metToken.options.address
+    var tx = await chain.contracts.tokenPorter.methods.addDestinationChain(destChainName, destTokanAddress).send({ from: owner })
     waitForTx(tx, chain.web3.eth)
   }
-  tx = chain.contracts.validator.updateThreshold(1, { from: owner })
+  tx = await chain.contracts.validator.methods.updateThreshold(1).send({ from: owner })
   waitForTx(tx, chain.web3.eth)
 }
 
@@ -114,7 +116,8 @@ function configureChain (chain, destChain) {
 async function prepareImportData (chain, receipt) {
   let burnHashes = []
   let i = 0
-  let decoder = ethjsABI.logDecoder(chain.contracts.tokenPorter.abi)
+  // todo: find alternate solution for logdecoder, web3 1.x has alot to offer
+  let decoder = ethjsABI.logDecoder(chain.contracts.tokenPorter.options.jsonInterface)
   let logExportReceipt = decoder(receipt.logs)[0]
 
   if (logExportReceipt.burnSequence > 15) {
@@ -122,7 +125,7 @@ async function prepareImportData (chain, receipt) {
   }
 
   while (i <= logExportReceipt.burnSequence) {
-    burnHashes.push(await chain.contracts.tokenPorter.exportedBurns(i))
+    burnHashes.push(await chain.contracts.tokenPorter.methods.exportedBurns(i).call())
     i++
   }
 

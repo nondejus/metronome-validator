@@ -1,13 +1,13 @@
 {                                                             
     "eth": {
         "chainName":"ETH",                                   
-       "nodeUrl": "http://localhost:8545",     
+       "nodeUrl": "ws://localhost:8546",     
         "address": "0x004ec07d2329997267ec62b4166639513386f32e"             
     },                                         
     "etc": {         
         "chainName":"ETC",                               
-       "nodeUrl": "http://localhost:8555",     
         "address": "0x004ec07d2329997267ec62b4166639513386f32e"
+       "nodeUrl": "ws://localhost:8556",     
     },
     "newRelic": {}                                       
 }                                              
