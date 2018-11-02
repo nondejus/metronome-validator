@@ -26,6 +26,7 @@
 const assert = require('chai').assert
 const ethjsABI = require('ethjs-abi')
 const _ = require('lodash')
+const ethers = require('ethers')
 const fs = require('fs')
 const util = require('./testUtil')
 var ethBuyer1
@@ -78,14 +79,10 @@ describe('cross chain testing', () => {
       let feePerTenThousand = 1
 
       // Buy some MET
-      let tx = await eth.web3.eth.sendTransaction({
-        to: eth.contracts.auctions.address,
-        from: ethBuyer1,
-        value: 2e16
-      })
-      util.waitForTx(tx, eth.web3.eth)
+      await util.getMET(eth, ethBuyer1)
       let metBalance = eth.contracts.metToken.balanceOf(ethBuyer1)
       assert(metBalance > 0, 'Exporter has no MET token balance')
+      metBalance = ethers.utils.bigNumberify(metBalance.valueOf())
 
       let fee = Math.floor(metBalance.div(2))
       let amount = metBalance.sub(fee)
@@ -96,12 +93,12 @@ describe('cross chain testing', () => {
 
       let extraData = 'D'
       let totalSupplybefore = await eth.contracts.metToken.totalSupply()
-      tx = await eth.contracts.metToken.export(
+      let tx = await eth.contracts.metToken.export(
         eth.web3.fromAscii('ETC'),
         etc.contracts.metToken.address,
         etcBuyer1,
-        amount.valueOf(),
-        fee.valueOf(),
+        amount.toString(),
+        fee,
         eth.web3.fromAscii(extraData),
         { from: ethBuyer1 }
       )
@@ -118,6 +115,7 @@ describe('cross chain testing', () => {
 
       let expectedBalanceOfRecepient = etc.contracts.metToken.balanceOf(etcBuyer1).add(amount)
       let balanceOfValidatorBefore = etc.contracts.metToken.balanceOf(etc.configuration.address)
+      console.log('importing')
       tx = await etc.contracts.metToken.importMET(
         etc.web3.fromAscii('ETH'),
         importDataObj.destinationChain,
