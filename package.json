@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "testValidator": "./node_modules/mocha/bin/mocha --timeout 100000"
+    "eslint": "eslint lib/*.js /*.js",
+    "testValidator": "./node_modules/mocha/bin/mocha --timeout 100000 ./test/testExportImport.js"
   },
   "author": "",
   "license": "MIT",
