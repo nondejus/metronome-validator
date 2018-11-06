@@ -1,0 +1,196 @@
+#!/bin/bash
+#set -e
+#set -o pipefail
+
+<< LICENSE
+The MIT License (MIT)
+
+Copyright 2017 - 2018, Alchemy Limited, LLC.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+LICENSE
+
+usage()
+{
+  cat <<- _EOM_
+  gethAttach: launch parity instance, preload metronome js and geth attach.
+
+  By default, get attach ETH chain
+
+  If --chain etc is offered, attach  to ETC/ETH. 
+
+  usage: gethAttach [--chain eth|etc ] | [-h]
+
+_EOM_
+}
+mkdir -p log
+
+DEST="Parity DevChain Local ETH"
+LIVE=0
+TEST=0
+LOCAL=1
+CHAIN="eth"
+ABI_DIR=abi/$CHAIN
+RPC=8545
+WS=8546
+PORT=33333
+CHAINARG="--chain dev"
+BOOTNODES=""
+DATADIR=/tmp/parity/local/eth
+GASARGS="--reseal-min-period 0 --min-gas-price 0 --gasprice 0" 
+RPCAPI="--rpcapi=web3,eth,personal,rpc,net,parity --ws-apis=web3,eth,personal,rpc,net,parity "
+#Bloq test nodes
+ETH_TEST_BOOTNODE="enode://a90b36105811c87207b3a9bef260c2bff02355b0f8c1bfbc1e8341ee332fc803bc0f62cbec61fcc443228580a7f2ec3eeab3b57a649203f6ae6955e54ee9dfac@35.202.109.171:30303"
+ETC_TEST_BOOTNODE="enode://5c604378ba83b38a4d8a47e45305d4c5b3a6841172fe2b55e062bde6fdd8b7a6f44f01ef5cc8e4c3a5d40ce78d2040e33b4f9697d23f9c20a1914e24278477d3@35.184.26.97:30303"
+ETH_TEST_PARITYSPEC="parity-spec.json"
+ETC_TEST_PARITYSPEC="parity-spec-etc.json"
+
+while [ "$1" != "" ]; do
+  case $1 in
+    --live )
+      LIVE=1
+      LOCAL=0
+      TEST=0
+      ;;
+    --test )
+      LIVE=0
+      TEST=1
+      LOCAL=0
+      ;;
+    --devnet )
+      LIVE=0
+      TEST=0
+      LOCAL=1
+      DEVNET=1
+      ;;
+    -h | --help )           usage
+      exit
+      ;;  
+    -c | --chain )    shift
+      CHAIN=$1
+      ABI_DIR=abi/$CHAIN
+      ;;
+    * )                     usage
+      exit 1
+  esac
+  shift
+done
+
+if [[ "$CHAIN" = "eth" ]]
+then
+  RPC=8545
+  WS=8546
+  PORT=33333
+  if [[ $LIVE = 1 ]]
+  then
+    echo "ETH live net deploy is not allowed."
+    exit 1
+  elif [[ $TEST = 1 ]]
+  then
+     DATADIR=./parity/testnet/eth
+     DEST="New Alchemy ETH Testnet"
+     #CHAINARG="--chain $ETH_TEST_PARITYSPEC"
+     CHAINARG="--chain dev"
+     BOOTNODES="--bootnodes $ETH_TEST_BOOTNODE"
+  elif [[ $DEVNET = 1 ]]
+  then
+     DATADIR=./parity/localnet/eth
+     DEST="New Alchemy ETH devnet"
+     CHAINARG="--chain devnet.json"
+     BOOTNODES="--bootnodes enode://cfc563d0c1ba5aa9a471babfcb876001501ab63ba6e2539054beea91deacbb279a6ba6fab17fb7b020251bf489bc5f3e9d5041c7b541513cb093a4c34c15db0a@35.227.101.52:33333"
+  else
+    DATADIR=/tmp/parity/local/eth
+    DEST="Parity DevChain Local ETH"
+  fi
+elif [[ "$CHAIN" = "etc" ]]
+then
+  RPC=8555
+  WS=8556
+  PORT=30301
+  if [[ $LIVE = 1 ]]
+  then
+    DEST="Etc Live Net"
+    CHAINARG="--chain classic"
+  elif [[ $TEST = 1 ]]
+  then
+     DATADIR=./parity/testnet/etc
+     DEST="New Alchemy ETC Testnet"
+     #CHAINARG="--chain $ETC_TEST_PARITYSPEC"
+     CHAINARG="--chain dev"
+     BOOTNODES="--bootnodes $ETC_TEST_BOOTNODE"
+  elif [[ $DEVNET = 1 ]]
+  then
+     DATADIR=./parity/localnet/etc
+     DEST="New Alchemy ETH devnet"
+     CHAINARG="--chain devnet.json"
+     BOOTNODES="--bootnodes enode://a28ade8c720013e3ceeb9e65c5fba6cb3a007f62f808a5e9f9aa988b651f2394558b68ffbea8c876829f784237fa98dee7cb8094f121980c47dc6a9d9ddbc3d4@35.227.101.52:30301"
+  else
+     DATADIR=/tmp/parity/local/etc
+     DEST="New Alchemy ETC Local"
+  fi
+fi
+
+if [[ $LIVE = 0 ]]; then
+#  PARITY="parity --geth --fat-db on --jsonrpc-port=$RPC --ws-port=$WS --port=$PORT --datadir=$DATADIR --tracing on  --pruning archive $CHAINARG $BOOTNODES $GASARGS > log/parity.$CHAIN.log 2>log/parity.$CHAIN.err.log"
+  PARITY="parity --geth $RPCAPI --jsonrpc-port=$RPC --ws-port=$WS --port=$PORT --datadir=$DATADIR --tracing off  --pruning archive $CHAINARG $BOOTNODES $GASARGS > log/parity.$CHAIN.log 2>log/parity.$CHAIN.err.log"
+else
+  PARITY="parity --geth $RPCAPI $CHAINARG > log/parity.$CHAIN.log 2>log/parity.$CHAIN.err.log"
+fi
+
+PARITY_URL="http://127.0.0.1:$RPC"
+
+
+echo "Turning off Parity..."
+if [[ "$CHAIN" = "etc" ]] 
+then
+    CHAINPID=$(lsof -t -i:8555)
+    if [[ ! -z "$CHAINPID" ]]; then
+      echo "Turning off ETC parity at port 8555"
+      kill -9 $CHAINPID
+    fi
+else
+    CHAINPID=$(lsof -t -i:8545)
+    if [[ ! -z "$CHAINPID" ]]; then
+      echo "Turning off ETH parity at port 8545"
+      kill -9 $CHAINPID
+    fi
+    CHAINPID=$(lsof -t -i:8546)
+    if [[ ! -z "$CHAINPID" ]]; then
+      echo "Turning off ETH parity at port 8545"
+      kill -9 $CHAINPID
+    fi
+fi
+
+sleep 5
+
+echo "Loading Parity: $PARITY"
+eval $PARITY &
+
+if [ $LIVE = 1 ] || [ $TEST = 1 ]
+then
+  sleep 5
+else
+  sleep 1
+fi
+
+
+PRELOAD="--preload $ABI_DIR/metronome.js"
+geth attach $PARITY_URL $PRELOAD
+exit 0
