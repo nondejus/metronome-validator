@@ -7,8 +7,18 @@ Note that you must have tmux installed.
 
 _EOM_
 DEV=0
+ARG=''
 while [ "$1" != "" ]; do
   case $1 in
+    --live )
+      ARG='--live'
+      ;;
+    --test )
+      ARG='--test'
+      ;;
+    --devnet )
+      ARG='--devnet'
+      ;;
     -d | --dev )
       DEV=1
       ;;
@@ -34,12 +44,12 @@ tmux rename-window 'Redis server'
 tmux send-keys 'redis-server' 'C-m'
 
 tmux new-window
-tmux send-keys './gethAttach' 'C-m'
+tmux send-keys "./gethAttach $ARG" 'C-m'
 tmux rename-window 'MET ETH'
 
 
 tmux new-window
-tmux send-keys './gethAttach --chain etc; touch launched' 'C-m'
+tmux send-keys "./gethAttach --chain etc $ARG" 'C-m'
 tmux rename-window 'MET ETC'
 
 echo "Waiting for parity ETH and ETC To launch."
