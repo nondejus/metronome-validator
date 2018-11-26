@@ -6,7 +6,30 @@ cat <<- _EOM_
 Note that you must have tmux installed. 
 
 _EOM_
-
+DEV=0
+ARG=''
+while [ "$1" != "" ]; do
+  case $1 in
+    --live )
+      ARG='--live'
+      ;;
+    --test )
+      ARG='--test'
+      ;;
+    --devnet )
+      ARG='--devnet'
+      ;;
+    -d | --dev )
+      DEV=1
+      ;;
+    -h | --help )           usage
+      exit
+      ;;
+    * )                     usage
+      exit 1
+  esac
+  shift
+done
 
 echo "Killing any old Metronome tmux sessions."
 tmux kill-session -t Metronome
@@ -21,30 +44,28 @@ tmux rename-window 'Redis server'
 tmux send-keys 'redis-server' 'C-m'
 
 tmux new-window
-tmux send-keys 'echo y|./gethAttach' 'C-m'
+tmux send-keys "./gethAttach $ARG" 'C-m'
 tmux rename-window 'MET ETH'
 
 
 tmux new-window
-tmux send-keys 'echo y|./gethAttach --chain etc; touch launched' 'C-m'
+tmux send-keys "./gethAttach --chain etc $ARG" 'C-m'
 tmux rename-window 'MET ETC'
 
 echo "Waiting for parity ETH and ETC To launch."
-while ! [ -f ./launched ]
-do
-  echo -n "#"
-  sleep 1
-done
-
-tmux select-window -t='MET ETH'
-tmux send-keys 'geth attach http://127.0.0.1:8545 --preload abi/eth/metronome.js' 'C-m'
-
-tmux select-window -t='MET ETC'
-tmux send-keys 'geth attach http://127.0.0.1:8555 --preload abi/etc/metronome.js' 'C-m'
+# while ! [ -f ./launched ]
+# do
+#   echo -n "#"
+#   sleep 1
+# done
 
 tmux new-window
 tmux rename-window 'Off-chain Validator'
-tmux send-keys 'node index.js launch --dev' 'C-m'
-# tmux send-keys 'node index.js launch --dev' 'C-m'  # 'metronome-validator launch' is actual command
+if [[ $DEV = 1 ]]
+  then
+  tmux send-keys 'node index.js launch --dev' 'C-m'
+else 
+  tmux send-keys 'node index.js launch' 'C-m'
+fi
 tmux -2 attach-session -t Metronome
 

@@ -83,7 +83,7 @@ async function getMET (chain, recepient) {
     })
     waitForTx(tx, web3.eth)
     metBalance = chain.contracts.metToken.balanceOf(web3.eth.accounts[0])
-    metBalance = ethers.utils.bigNumberify(metBalance.valueOf())
+    metBalance = ethers.utils.bigNumberify(web3.toHex(metBalance))
     if (metBalance.lt(ethers.utils.bigNumberify('10000000000000000'))) {
       // Buy more met from AC
       tx = await chain.contracts.autonomousConverter.convertEthToMet(1, { from: web3.eth.accounts[0], value: 1e18 })
@@ -100,7 +100,7 @@ async function getMET (chain, recepient) {
 function configureChain (chain, destChain) {
   let destinationChain = chain.contracts.tokenPorter.destinationChains(destChain.name)
   let owner = chain.contracts.tokenPorter.owner()
-  chain.web3.personal.unlockAccount(owner, 'newOwner')
+  chain.web3.personal.unlockAccount(owner, '')
   if (destinationChain === '0x0000000000000000000000000000000000000000') {
     var destTokanAddress = destChain.contracts.metToken.address
     var tx = chain.contracts.tokenPorter.addDestinationChain(destChain.name, destTokanAddress, { from: owner })
