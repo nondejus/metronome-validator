@@ -100,7 +100,7 @@ async function getMET (chain, recepient) {
 function configureChain (chain, destChain) {
   let destinationChain = chain.contracts.tokenPorter.destinationChains(destChain.name)
   let owner = chain.contracts.tokenPorter.owner()
-  chain.web3.personal.unlockAccount(owner, 'newOwner')
+  chain.web3.personal.unlockAccount(owner, '')
   if (destinationChain === '0x0000000000000000000000000000000000000000') {
     var destTokanAddress = destChain.contracts.metToken.address
     var tx = chain.contracts.tokenPorter.addDestinationChain(destChain.name, destTokanAddress, { from: owner })
