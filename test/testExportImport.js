@@ -24,9 +24,7 @@
 */
 
 const assert = require('chai').assert
-const ethjsABI = require('ethjs-abi')
 const _ = require('lodash')
-const ethers = require('ethers')
 const fs = require('fs')
 const util = require('./testUtil')
 var ethBuyer1
@@ -76,11 +74,9 @@ describe('cross chain testing', () => {
       await util.getMET(eth, ethBuyer1)
       let metBalance = eth.contracts.metToken.balanceOf(ethBuyer1)
       assert(metBalance > 0, 'Exporter has no MET token balance')
-      metBalance = ethers.utils.bigNumberify(metBalance.valueOf())
-
       let fee = Math.floor(metBalance.div(2))
       let amount = metBalance.sub(fee)
-      assert(metBalance, amount.add(fee), 'Total of amount and fee should be equal to metBalance')
+      assert.equal(metBalance.valueOf(), amount.add(fee), 'Total of amount and fee should be equal to metBalance')
       assert.isAbove(fee, flatFee, 'Fee should be greater than defined flatFee')
       // const calculatedFee = amount.mul(feePerTenThousand).div(10000)
       assert.isAbove(fee, amount.mul(feePerTenThousand).div(10000).toNumber(), 'Fee should be greater than defined fee')
@@ -102,7 +98,7 @@ describe('cross chain testing', () => {
         reject(new Error('Export function reverted'))
       }
       let totalSupplyAfter = eth.contracts.metToken.totalSupply()
-      assert(totalSupplybefore.sub(totalSupplyAfter), amount.add(fee), 'Export from ETH failed')
+      assert.equal(totalSupplybefore.sub(totalSupplyAfter).valueOf(), amount.add(fee).valueOf(), 'Export from ETH failed')
 
       let importDataObj = await util.prepareImportData(eth, receipt)
       let expectedTotalSupply = etc.contracts.metToken.totalSupply().add(amount).add(fee)
@@ -166,8 +162,8 @@ describe('cross chain testing', () => {
       }
       let totalSupplyAfter = etc.contracts.metToken.totalSupply()
 
-      assert(
-        totalSupplybefore.sub(totalSupplyAfter),
+      assert.equal(
+        totalSupplybefore.sub(totalSupplyAfter).valueOf(),
         amount + fee,
         'Export from ETH failed'
       )
