@@ -24,11 +24,9 @@
 */
 const assert = require('chai').assert
 const _ = require('lodash')
-const ethers = require('ethers')
 const fs = require('fs')
-const util = require('./testUtil')
-const BN = require('bn.js')
 const ethers = require('ethers')
+const util = require('./testUtil')
 var ethBuyer1
 var etcBuyer1
 var eth
@@ -70,12 +68,6 @@ before(async () => {
   etcBuyer1 = response.etcBuyer
 })
 
-after(() => {
-  console.log('closing ws connection')
-  eth.web3.currentProvider.connection.close()
-  etc.web3.currentProvider.connection.close()
-})
-
 describe('cross chain testing', () => {
   beforeEach(async () => {
     eth.web3.eth.personal.unlockAccount(ethBuyer1, 'password')
@@ -88,7 +80,6 @@ describe('cross chain testing', () => {
       let feePerTenThousand = 1
       // Buy some MET
       await util.getMET(eth, ethBuyer1)
-      // util.waitForTx(tx, eth.web3.eth)
       let metBalance = await eth.contracts.metToken.methods
         .balanceOf(ethBuyer1)
         .call()
@@ -101,7 +92,6 @@ describe('cross chain testing', () => {
         'Total of amount and fee should be equal to metBalance'
       )
       assert(fee.gt(flatFee), 'Fee should be greater than defined flatFee')
-      // const calculatedFee = amount.mul(feePerTenThousand).div(10000)
       assert(
         fee.gt(amount.mul(feePerTenThousand).div(10000)),
         'Fee should be greater than defined fee'
@@ -125,13 +115,8 @@ describe('cross chain testing', () => {
             eth.web3.utils.toHex(extraData)
           )
           .send({ from: ethBuyer1 })
-          .on('error', async error => {
-            console.log('in error', error)
-            reject(error)
-          })
-      } catch (e) {
-        console.log('in catch', e)
-        reject(e)
+      } catch (error) {
+        return reject(error)
       }
 
       let totalSupplyAfter = await eth.contracts.metToken.methods
@@ -150,7 +135,6 @@ describe('cross chain testing', () => {
         .totalSupply()
         .call()
       etcTotalSupply = ethers.utils.bigNumberify(etcTotalSupply)
-      // TODO: how to add (+) value returned from call() function
       let expectedTotalSupply = etcTotalSupply.add(amount).add(fee)
       var etcBalance = await etc.contracts.metToken.methods
         .balanceOf(etcBuyer1)
@@ -158,22 +142,22 @@ describe('cross chain testing', () => {
       etcBalance = ethers.utils.bigNumberify(eth.web3.utils.toHex(etcBalance))
       let expectedBalanceOfRecepient = etcBalance.add(amount)
       console.log('importing - test 1')
-      receipt = await etc.contracts.metToken.methods
-        .importMET(
-          eth.web3.utils.toHex('ETH'),
-          importDataObj.destinationChain,
-          importDataObj.addresses,
-          importDataObj.extraData,
-          importDataObj.burnHashes,
-          importDataObj.supplyOnAllChains,
-          importDataObj.importData,
-          importDataObj.root
-        )
-        .send({ from: etcBuyer1 })
-        .on('error', error => {
-          reject(error)
-        })
-      // util.waitForTx(tx, etc.web3.eth)
+      try {
+        receipt = await etc.contracts.metToken.methods
+          .importMET(
+            eth.web3.utils.toHex('ETH'),
+            importDataObj.destinationChain,
+            importDataObj.addresses,
+            importDataObj.extraData,
+            importDataObj.burnHashes,
+            importDataObj.supplyOnAllChains,
+            importDataObj.importData,
+            importDataObj.root
+          )
+          .send({ from: etcBuyer1 })
+      } catch (error) {
+        return reject(error)
+      }
       if (!receipt.status) {
         reject(new Error('importMET function reverted'))
       }
@@ -196,7 +180,7 @@ describe('cross chain testing', () => {
                   expectedBalanceOfRecepient
                 )
               } catch (e) {
-                reject(e)
+                return reject(e)
               }
               resolve()
             }
@@ -221,19 +205,21 @@ describe('cross chain testing', () => {
         .call()
       totalSupplybefore = ethers.utils.bigNumberify(totalSupplybefore)
       console.log('exporting - test 2')
-      let receipt = await etc.contracts.metToken.methods
-        .export(
-          eth.web3.utils.toHex('ETH'),
-          eth.contracts.metToken.options.address,
-          ethBuyer1,
-          amount,
-          fee,
-          eth.web3.utils.toHex(extraData)
-        )
-        .send({ from: etcBuyer1 })
-        .on('error', error => {
-          reject(error)
-        })
+      var receipt
+      try {
+        receipt = await etc.contracts.metToken.methods
+          .export(
+            eth.web3.utils.toHex('ETH'),
+            eth.contracts.metToken.options.address,
+            ethBuyer1,
+            amount,
+            fee,
+            eth.web3.utils.toHex(extraData)
+          )
+          .send({ from: etcBuyer1 })
+      } catch (error) {
+        return reject(error)
+      }
       if (!receipt.status) {
         reject(new Error('Export function reverted'))
       }
@@ -256,21 +242,22 @@ describe('cross chain testing', () => {
         .call()
       balanceOfRecepient = ethers.utils.bigNumberify(balanceOfRecepient)
       let expectedBalanceOfRecepient = balanceOfRecepient.add(amount)
-      receipt = await eth.contracts.metToken.methods
-        .importMET(
-          eth.web3.utils.toHex('ETC'),
-          importDataObj.destinationChain,
-          importDataObj.addresses,
-          importDataObj.extraData,
-          importDataObj.burnHashes,
-          importDataObj.supplyOnAllChains,
-          importDataObj.importData,
-          importDataObj.root
-        )
-        .send({ from: ethBuyer1 })
-        .on('error', error => {
-          reject(error)
-        })
+      try {
+        receipt = await eth.contracts.metToken.methods
+          .importMET(
+            eth.web3.utils.toHex('ETC'),
+            importDataObj.destinationChain,
+            importDataObj.addresses,
+            importDataObj.extraData,
+            importDataObj.burnHashes,
+            importDataObj.supplyOnAllChains,
+            importDataObj.importData,
+            importDataObj.root
+          )
+          .send({ from: ethBuyer1 })
+      } catch (error) {
+        return reject(error)
+      }
       if (!receipt.status) {
         reject(new Error('importMET function reverted'))
       }
@@ -294,7 +281,7 @@ describe('cross chain testing', () => {
                   expectedBalanceOfRecepient
                 )
               } catch (e) {
-                reject(e)
+                return reject(e)
               }
               resolve()
             }
@@ -304,87 +291,6 @@ describe('cross chain testing', () => {
     })
   })
 
-  // it('ETH to ETC: Fake export receipt, should pass on-chain validation and fail on off-chain validation', () => {
-  //   return new Promise(async (resolve, reject) => {
-  //     // Buy some MET
-  //     let receipt = await eth.web3.eth.sendTransaction({ to: eth.contracts.auctions.options.address, from: ethBuyer1, value: 2e16 })
-  //     let metBalance = await eth.contracts.metToken.methods.balanceOf(ethBuyer1).call()
-  //     console.log('metBalance', metBalance)
-  //     assert(metBalance > 0, 'Exporter has no MET token balance')
-  //     let fee = Math.floor(metBalance / 2)
-  //     let amount = metBalance - fee
-  //     console.log('amount', amount)
-  //     console.log('fee', fee)
-  //     let extraData = 'D'
-  //     let totalSupplybefore = await eth.contracts.metToken.methods.totalSupply().call()
-  //     totalSupplybefore = new BN(totalSupplybefore, 10)
-  //     receipt = await eth.contracts.metToken.methods.export(
-  //       eth.web3.utils.toHex('ETC'),
-  //       etc.contracts.metToken.options.address,
-  //       etcBuyer1,
-  //       ethers.utils.bigNumberify(amount),
-  //       ethers.utils.bigNumberify(fee),
-  //       eth.web3.utils.toHex(extraData))
-  //       .send({ from: ethBuyer1 })
-  //       .on('error', console.error)
-  //     console.log('receipt', receipt)
-  //     if (!receipt.status) {
-  //       reject(new Error('export function reverted'))
-  //     }
-  //     let totalSupplyAfter = await eth.contracts.metToken.methods.totalSupply().call()
-  //     totalSupplyAfter = new BN(totalSupplyAfter, 10)
-  //     amount = new BN(amount, 10)
-  //     fee = new BN(fee, 10)
-  //     console.log('1')
-  //     assert(totalSupplybefore.sub(totalSupplyAfter), amount.add(fee), 'Export from ETH failed')
-  //     console.log('2')
-  //     const importDataJson = JSON.parse(getDataForImport())
-  //     console.log('importDataJson', importDataJson)
-  //     var data = importDataJson.intData
-  //     data = data.map(x => ethers.utils.bigNumberify(x.toString()))
-  //     const burnHashes = importDataJson.burnHashes
-  //     const addresses = importDataJson.addresses
-  //     var filter = { 'transactionHash': receipt.transactionHash }
-  //     var logExportReceipt = await eth.contracts.tokenPorter.getPastEvents(
-  //       'ExportReceiptLog', { filter, fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber })
-  //     const returnValues = logExportReceipt[0].returnValues
-
-  //     // let outcome = await etc.contracts.metToken.methods.importMET(
-  //     //   importDataJson.eth,
-  //     //   importDataJson.etc,
-  //     //   addresses,
-  //     //   importDataJson.extraData,
-  //     //   burnHashes,
-  //     //   returnValues.supplyOnAllChains,
-  //     //   data,
-  //     //   importDataJson.root).call({ from: etcBuyer1 })
-  //     // assert(outcome, 'call to importMET should return true')
-  //     receipt = await etc.contracts.metToken.methods.importMET(
-  //       importDataJson.eth,
-  //       importDataJson.etc,
-  //       addresses,
-  //       importDataJson.extraData,
-  //       burnHashes,
-  //       returnValues.supplyOnAllChains,
-  //       data,
-  //       importDataJson.root)
-  //       .send({ from: etcBuyer1 })
-  //       .on('error', console.error)
-  //     if (!receipt.status) {
-  //       reject(new Error('importMET function reverted'))
-  //     }
-  //     etc.contracts.validator.events.LogAttestation((err, response) => {
-  //       console.log('attestions event', response)
-  //       if (err) {
-  //         console.log('Attestation error', err)
-  //       } else if (burnHashes[1] === response.returnValues.hash) {
-  //         assert.isFalse(response.args.isValid)
-  //       }
-  //     })
-  //     resolve()
-  //   })
-  // })
-
   it('ETH to ETC: import should fail as provided fee is less than defined fee', () => {
     return new Promise(async (resolve, reject) => {
       // Buy some MET
@@ -393,8 +299,6 @@ describe('cross chain testing', () => {
         .balanceOf(ethBuyer1)
         .call()
       metBalance = ethers.utils.bigNumberify(metBalance)
-      // let fee = 10 // 10 wei MET
-      // let amount = metBalance - fee
       let fee = ethers.utils.bigNumberify(2)
       let amount = metBalance.sub(fee)
       let extraData = 'D'
