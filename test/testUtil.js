@@ -1,4 +1,5 @@
 const ethjsABI = require('ethjs-abi')
+const ethers = require('ethers')
 const MerkleTreeJs = require('merkletreejs')
 const crypto = require('crypto')
 const reader = require('../lib/file-reader')
@@ -52,7 +53,11 @@ async function setupAccount (web3) {
   let accounts = await web3.eth.getAccounts()
   let user = await web3.eth.personal.newAccount('password')
   let tx = await web3.eth.personal.unlockAccount(accounts[0], '')
-  tx = await web3.eth.sendTransaction({ to: user, from: accounts[0], value: 2e17 })
+  tx = await web3.eth.sendTransaction({
+    to: user,
+    from: accounts[0],
+    value: 2e20
+  })
   waitForTx(tx, web3.eth)
   return user
 }
@@ -100,15 +105,20 @@ async function getMET (chain, recepient) {
 // Configure chain: Add destination chain and add validators
 async function configureChain (chain, destChain) {
   let destChainName = chain.web3.utils.toHex(destChain.name)
-  let destinationChain = await chain.contracts.tokenPorter.methods.destinationChains(destChainName).call()
+  let destinationChain = await chain.contracts.tokenPorter.methods
+    .destinationChains(destChainName)
+    .call()
   let owner = await chain.contracts.tokenPorter.methods.owner().call()
   if (destinationChain === '0x0000000000000000000000000000000000000000') {
-    await chain.web3.eth.personal.unlockAccount(owner, 'newOwner')
+    await chain.web3.eth.personal.unlockAccount(owner, '')
     var destTokanAddress = destChain.contracts.metToken.options.address
-    var tx = await chain.contracts.tokenPorter.methods.addDestinationChain(destChainName, destTokanAddress).send({ from: owner })
-    waitForTx(tx, chain.web3.eth)
+    var tx = await chain.contracts.tokenPorter.methods
+      .addDestinationChain(destChainName, destTokanAddress)
+      .send({ from: owner })
   }
-  tx = await chain.contracts.validator.methods.updateThreshold(1).send({ from: owner })
+  tx = await chain.contracts.validator.methods
+    .updateThreshold(1)
+    .send({ from: owner })
   waitForTx(tx, chain.web3.eth)
 }
 
@@ -116,49 +126,85 @@ async function configureChain (chain, destChain) {
 async function prepareImportData (chain, receipt) {
   let burnHashes = []
   let i = 0
-  // todo: find alternate solution for logdecoder, web3 1.x has alot to offer
-  let decoder = ethjsABI.logDecoder(chain.contracts.tokenPorter.options.jsonInterface)
-  let logExportReceipt = decoder(receipt.logs)[0]
+  var filter = { transactionHash: receipt.transactionHash }
+  var logExportReceipt = await chain.contracts.tokenPorter.getPastEvents(
+    'ExportReceiptLog',
+    { filter, fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber }
+  )
+  const returnValues = logExportReceipt[0].returnValues
 
-  if (logExportReceipt.burnSequence > 15) {
-    i = logExportReceipt.burnSequence - 15
+  if (returnValues.burnSequence > 15) {
+    i = returnValues.burnSequence - 15
   }
-
-  while (i <= logExportReceipt.burnSequence) {
-    burnHashes.push(await chain.contracts.tokenPorter.methods.exportedBurns(i).call())
+  while (i <= returnValues.burnSequence) {
+    burnHashes.push(
+      await chain.contracts.tokenPorter.methods.exportedBurns(i).call()
+    )
     i++
   }
-
   return {
     addresses: [
-      logExportReceipt.destinationMetronomeAddr,
-      logExportReceipt.destinationRecipientAddr
+      returnValues.destinationMetronomeAddr,
+      returnValues.destinationRecipientAddr
     ],
-    burnHashes: [
-      logExportReceipt.prevBurnHash,
-      logExportReceipt.currentBurnHash
-    ],
+    burnHashes: [returnValues.prevBurnHash, returnValues.currentBurnHash],
     importData: [
-      logExportReceipt.blockTimestamp,
-      logExportReceipt.amountToBurn,
-      logExportReceipt.fee,
-      logExportReceipt.currentTick,
-      logExportReceipt.genesisTime,
-      logExportReceipt.dailyMintable,
-      logExportReceipt.burnSequence,
-      logExportReceipt.dailyAuctionStartTime
+      ethers.utils.bigNumberify(returnValues.blockTimestamp),
+      ethers.utils.bigNumberify(returnValues.amountToBurn),
+      ethers.utils.bigNumberify(returnValues.fee),
+      ethers.utils.bigNumberify(returnValues.currentTick),
+      ethers.utils.bigNumberify(returnValues.genesisTime),
+      ethers.utils.bigNumberify(returnValues.dailyMintable),
+      ethers.utils.bigNumberify(returnValues.burnSequence),
+      ethers.utils.bigNumberify(returnValues.dailyAuctionStartTime)
     ],
     root: getMerkleRoot(burnHashes),
-    extraData: logExportReceipt.extraData,
-    supplyOnAllChains: logExportReceipt.supplyOnAllChains,
-    destinationChain: logExportReceipt.destinationChain
+    extraData: returnValues.extraData,
+    supplyOnAllChains: returnValues.supplyOnAllChains,
+    destinationChain: returnValues.destinationChain
   }
+}
+
+async function getMET (chain, recepient) {
+  var web3 = chain.web3
+  let currentAuction = await chain.contracts.auctions.methods.currentAuction().call()
+  if (currentAuction === '0') {
+    await web3.eth.sendTransaction({
+      to: chain.contracts.auctions.options.address,
+      from: recepient,
+      value: 2e16
+    })
+    return
+  }
+
+  // This is for testnet-devnet .
+  // If its old contracts and initial auction closed on testnet-devnet and mintable may be 0. try to get met by alternate sources i.e AC, transfer
+  let accounts = await web3.eth.getAccounts()
+  let metBalance = await chain.contracts.metToken.methods.balanceOf(accounts[0]).call()
+  metBalance = ethers.utils.bigNumberify(web3.toHex(metBalance))
+  if (metBalance.lt(ethers.utils.bigNumberify('10000000000000000'))) {
+    // buy some met transfer to new user
+    await web3.eth.sendTransaction({
+      to: chain.contracts.auctions.options.address,
+      from: accounts[0],
+      value: 2e18
+    })
+    metBalance = chain.contracts.metToken.methods.balanceOf(accounts[0]).call()
+    metBalance = ethers.utils.bigNumberify(metBalance)
+    if (metBalance.lt(ethers.utils.bigNumberify('10000000000000000'))) {
+      // Buy more met from AC
+      await chain.contracts.autonomousConverter.methods.convertEthToMet(1).send({ from: accounts[0], value: 1e18 })
+    }
+  }
+  await chain.contracts.metToken.methods.enableMETTransfers().send({ from: accounts[0] })
+  await chain.contracts.metToken.methods.transfer(recepient, 1e16).send({ from: accounts[0] })
+  metBalance = await chain.contracts.metToken.methods.balanceOf(recepient).call()
 }
 
 // Calculate merkle root for given hashes
 function getMerkleRoot (hashes) {
   const leaves = hashes.map(x => Buffer.from(x.slice(2), 'hex'))
-  const tree = new MerkleTreeJs(leaves, (data) => {
+  const tree = new MerkleTreeJs(leaves, data => {
     return crypto
       .createHash('sha256')
       .update(data)
