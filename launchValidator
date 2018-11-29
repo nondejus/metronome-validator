@@ -58,7 +58,7 @@ echo "Waiting for parity ETH and ETC To launch."
 #   echo -n "#"
 #   sleep 1
 # done
-
+sleep 10
 tmux new-window
 tmux rename-window 'Off-chain Validator'
 if [[ $DEV = 1 ]]
