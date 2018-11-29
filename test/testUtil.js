@@ -1,4 +1,3 @@
-const ethjsABI = require('ethjs-abi')
 const ethers = require('ethers')
 const MerkleTreeJs = require('merkletreejs')
 const crypto = require('crypto')
@@ -142,7 +141,7 @@ async function getMET (chain, recepient) {
       from: accounts[0],
       value: 2e18
     })
-    metBalance = chain.contracts.metToken.methods.balanceOf(accounts[0]).call()
+    metBalance = await chain.contracts.metToken.methods.balanceOf(accounts[0]).call()
     metBalance = ethers.utils.bigNumberify(metBalance)
     if (metBalance.lt(ethers.utils.bigNumberify('10000000000000000'))) {
       // Buy more met from AC
