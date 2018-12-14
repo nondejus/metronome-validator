@@ -118,8 +118,6 @@ describe('cross chain testing', () => {
       } catch (error) {
         return reject(error)
       }
-      let totalSupplyAfter = eth.contracts.metToken.totalSupply()
-      assert.equal(totalSupplybefore.sub(totalSupplyAfter).valueOf(), amount.add(fee).valueOf(), 'Export from ETH failed')
 
       let totalSupplyAfter = await eth.contracts.metToken.methods
         .totalSupply()
