@@ -113,6 +113,17 @@ async function prepareImportData (chain, receipt) {
   }
 }
 
+async function mineBlocks (chain, count, recepient) {
+  for (let i = 0; i < count; i++) {
+    await chain.web3.eth.sendTransaction({
+      to: recepient,
+      from: recepient,
+      value: 10
+    })
+    console.log('Block height', await chain.web3.eth.getBlockNumber())
+  }
+}
+
 async function getMET (chain, recepient) {
   var web3 = chain.web3
   let currentAuction = await chain.contracts.auctions.methods
@@ -176,4 +187,4 @@ function getMerkleRoot (hashes) {
   return '0x' + tree.getRoot().toString('hex')
 }
 
-module.exports = { initContracts, prepareImportData, getMET }
+module.exports = { initContracts, prepareImportData, getMET, mineBlocks }

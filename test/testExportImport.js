@@ -155,6 +155,8 @@ describe('cross chain testing', () => {
             importDataObj.root
           )
           .send({ from: etcBuyer1 })
+        await util.mineBlocks(etc, 10, etcBuyer1)
+        await util.mineBlocks(eth, 5, ethBuyer1)
       } catch (error) {
         return reject(error)
       }
@@ -255,6 +257,8 @@ describe('cross chain testing', () => {
             importDataObj.root
           )
           .send({ from: ethBuyer1 })
+        await util.mineBlocks(etc, 10, etcBuyer1)
+        await util.mineBlocks(eth, 5, ethBuyer1)
       } catch (error) {
         return reject(error)
       }
