@@ -66,7 +66,7 @@ async function configureChain (chain, destChain) {
       .send({ from: owner })
   }
   await chain.contracts.validator.methods
-    .updateThreshold(1)
+    .updateThreshold(2)
     .send({ from: owner })
 }
 
