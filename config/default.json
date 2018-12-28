@@ -1,14 +1,15 @@
 {                                                             
     "eth": {
-        "chainName":"ETH",                                   
-       "nodeUrl": "ws://localhost:8546",     
-        "address": "0x004ec07d2329997267ec62b4166639513386f32e"             
+        "chainName":"ETH",
+        "httpURL": "http://localhost:8545",                                   
+        "wsURL": "ws://localhost:8546",     
+        "address": "0xa8304f840e17b80771a5ecbb87aeed82f1d0a73e"            
     },                                         
     "etc": {         
         "chainName":"ETC",
-        "nodeUrl": "ws://localhost:8556",                              
-        "address": "0x004ec07d2329997267ec62b4166639513386f32e"
-            
+        "httpURL": "http://localhost:8555",                                   
+        "wsURL": "ws://localhost:8556",                             
+        "address": "0x2b0b431bd1007cad52e942e859527fc33406d139"   
     },
     "newRelic": {}                                       
-}                                              
+}
