@@ -10,10 +10,8 @@ const config = require('config')
 function initContracts () {
   return new Promise(async (resolve, reject) => {
     let ethChain, etcChain, ethBuyer, etcBuyer
-
-    config.eth.password = ''
-    config.etc.password = ''
-
+    config.eth.password = 'eth'
+    config.etc.password = 'etc'
     let metronome = reader.readMetronome()
     let metronomeContracts = parser.parseMetronome(metronome)
     // create chain object to get contracts
@@ -65,9 +63,6 @@ async function configureChain (chain, destChain) {
       .addDestinationChain(destChainName, destTokanAddress)
       .send({ from: owner })
   }
-  await chain.contracts.validator.methods
-    .updateThreshold(2)
-    .send({ from: owner })
 }
 
 // Prepare import data using export receipt
@@ -76,7 +71,7 @@ async function prepareImportData (chain, receipt) {
   let i = 0
   var filter = { transactionHash: receipt.transactionHash }
   var logExportReceipt = await chain.contracts.tokenPorter.getPastEvents(
-    'ExportReceiptLog',
+    'LogExportReceipt',
     { filter, fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber }
   )
   const returnValues = logExportReceipt[0].returnValues
@@ -90,6 +85,8 @@ async function prepareImportData (chain, receipt) {
     )
     i++
   }
+  let genesisTime = await chain.contracts.auctions.methods.genesisTime().call()
+  let dailyAuctionStartTime = await chain.contracts.auctions.methods.dailyAuctionStartTime().call()
   return {
     addresses: [
       returnValues.destinationMetronomeAddr,
@@ -101,10 +98,10 @@ async function prepareImportData (chain, receipt) {
       ethers.utils.bigNumberify(returnValues.amountToBurn),
       ethers.utils.bigNumberify(returnValues.fee),
       ethers.utils.bigNumberify(returnValues.currentTick),
-      ethers.utils.bigNumberify(returnValues.genesisTime),
+      ethers.utils.bigNumberify(genesisTime),
       ethers.utils.bigNumberify(returnValues.dailyMintable),
       ethers.utils.bigNumberify(returnValues.burnSequence),
-      ethers.utils.bigNumberify(returnValues.dailyAuctionStartTime)
+      ethers.utils.bigNumberify(dailyAuctionStartTime)
     ],
     root: getMerkleRoot(burnHashes),
     extraData: returnValues.extraData,
