@@ -29,14 +29,13 @@ const crypto = require('crypto')
 const reader = require('../lib/file-reader')
 const parser = require('../lib/parser')
 const Chain = require('../lib/chain')
-const config = require('config')
-
+require('dotenv').config({path: 'validator.env'})
+var config
 // create contract object from abi
 function initContracts () {
   return new Promise(async (resolve, reject) => {
     let ethChain, etcChain, ethBuyer, etcBuyer
-    config.eth.password = 'eth'
-    config.etc.password = 'etc'
+    var config = createConfigObj()
     let metronome = reader.readMetronome()
     let metronomeContracts = parser.parseMetronome(metronome)
     // create chain object to get contracts
@@ -48,7 +47,6 @@ function initContracts () {
     // ETC setup and init
     etcBuyer = await setupAccount(etcChain.web3)
     await configureChain(etcChain, ethChain)
-
     resolve({
       ethChain: ethChain,
       ethBuyer: ethBuyer,
@@ -58,14 +56,30 @@ function initContracts () {
   })
 }
 
+function createConfigObj () {
+  config = { eth: {}, etc: {} }
+  config.eth.chainName = 'ETH'
+  config.eth.httpURL = process.env.eth_http_url
+  config.eth.wsURL = process.env.eth_ws_url
+  config.eth.address = process.env.eth_validator_address
+  config.eth.password = process.env.eth_validator_password
+
+  config.etc.chainName = 'ETC'
+  config.etc.httpURL = process.env.etc_http_url
+  config.etc.wsURL = process.env.etc_ws_url
+  config.etc.address = process.env.etc_validator_address
+  config.etc.password = process.env.etc_validator_password
+  return config
+}
+
 // Create account and send some ether in it
 async function setupAccount (web3) {
-  let accounts = await web3.eth.getAccounts()
+  // let accounts = await web3.eth.getAccounts()
   let user = await web3.eth.personal.newAccount('password')
-  await web3.eth.personal.unlockAccount(accounts[0], '')
+  await web3.eth.personal.unlockAccount(config.etc.address, config.etc.password)
   await web3.eth.sendTransaction({
     to: user,
-    from: accounts[0],
+    from: config.etc.address,
     value: 2e20
   })
   return user

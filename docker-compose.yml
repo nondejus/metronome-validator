@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  valiator:
+    image: patidarmanoj/metronome-validator:latest
+    command: node index.js launch
+    volumes:
+      - .:/usr/src/metronome-validator
+    network_mode: host
+    depends_on: 
+      - redis-server
+    restart: always
+  redis-server:
+    container_name: redis-server
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ../data/redis:/data
+    restart: always

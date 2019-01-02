@@ -25,10 +25,9 @@
 
 const program = require('commander')
 const process = require('process')
-const logger = require('./lib/logger')(__filename)
 const reader = require('./lib/file-reader')
 const launcher = require('./lib/launcher')
-const config = require('config')
+require('dotenv').config({path: 'validator.env'})
 
 function init () {
   program
@@ -45,24 +44,28 @@ function init () {
 }
 
 function launchValidator (ethPassword, etcPassword) {
-  if (config.newRelic.licenseKey) {
-    require('newrelic')
-  }
-  config.eth.password = processArgument(ethPassword)
-  config.etc.password = processArgument(etcPassword)
-
+  // if (config.newRelic.licenseKey) {
+  //   require('newrelic')
+  // }
+  var config = createConfigObj()
   const metronome = reader.readMetronome()
   launcher.launch(config, metronome)
 }
 
-function processArgument (argument) {
-  if (program.dev && !argument) {
-    argument = ''
-  } else if (!argument) {
-    logger.error('Password for ETH/ETC is required in production environment, use --dev option for development environment')
-    process.exit(1)
-  }
-  return argument
+function createConfigObj () {
+  var config = { eth: {}, etc: {} }
+  config.eth.chainName = 'ETH'
+  config.eth.httpURL = process.env.eth_http_url
+  config.eth.wsURL = process.env.eth_ws_url
+  config.eth.address = process.env.eth_validator_address
+  config.eth.password = process.env.eth_validator_password
+
+  config.etc.chainName = 'ETC'
+  config.etc.httpURL = process.env.etc_http_url
+  config.etc.wsURL = process.env.etc_ws_url
+  config.etc.address = process.env.etc_validator_address
+  config.etc.password = process.env.etc_validator_password
+  return config
 }
 
 init()

@@ -1,0 +1,20 @@
+FROM ubuntu
+
+WORKDIR /usr/src
+RUN apt-get update
+RUN apt-get -y install sudo
+RUN apt-get -y install wget
+RUN apt-get -y install curl
+RUN apt-get install -y gnupg
+RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+RUN apt-get install -y nodejs
+RUN apt-get update
+RUN apt install -y redis-server
+RUN apt-get install -y tmux
+RUN apt-get -y install jq
+RUN apt-get -y install lsof
+RUN apt-get -y install software-properties-common
+RUN add-apt-repository -y ppa:ethereum/ethereum
+RUN apt-get update
+RUN apt-get -y install ethereum
+CMD tail -f /dev/null
