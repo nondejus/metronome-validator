@@ -149,7 +149,7 @@ fi
 
 if [[ $LIVE = 0 ]]; then
 #  PARITY="parity --geth --fat-db on --jsonrpc-port=$RPC --ws-port=$WS --port=$PORT --datadir=$DATADIR --tracing on  --pruning archive $CHAINARG $BOOTNODES $GASARGS > log/parity.$CHAIN.log 2>log/parity.$CHAIN.err.log"
-  PARITY="parity --geth $RPCAPI --jsonrpc-port=$RPC --ws-port=$WS --port=$PORT --datadir=$DATADIR --tracing off  --pruning archive $CHAINARG $BOOTNODES $GASARGS > log/parity.$CHAIN.log 2>log/parity.$CHAIN.err.log"
+  PARITY="parity --geth --jsonrpc-apis all --jsonrpc-hosts all --jsonrpc-interface all --jsonrpc-cors all --ws-interface all --ws-origins all --ws-hosts all --rpccorsdomain '*' $RPCAPI --jsonrpc-port=$RPC --ws-port=$WS --port=$PORT --datadir=$DATADIR --tracing off  --pruning archive $CHAINARG $BOOTNODES $GASARGS > log/parity.$CHAIN.log 2>log/parity.$CHAIN.err.log"
 else
   PARITY="parity --geth $RPCAPI $CHAINARG > log/parity.$CHAIN.log 2>log/parity.$CHAIN.err.log"
 fi
