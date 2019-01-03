@@ -1,19 +1,41 @@
+/*
+    The MIT License (MIT)
+
+    Copyright 2018 - 2019, Autonomous Software.
+
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 const ethers = require('ethers')
 const MerkleTreeJs = require('merkletreejs')
 const crypto = require('crypto')
 const reader = require('../lib/file-reader')
 const parser = require('../lib/parser')
 const Chain = require('../lib/chain')
-const config = require('config')
-
+require('dotenv').config({path: 'validator.env'})
+var config
 // create contract object from abi
 function initContracts () {
   return new Promise(async (resolve, reject) => {
     let ethChain, etcChain, ethBuyer, etcBuyer
-
-    config.eth.password = ''
-    config.etc.password = ''
-
+    var config = createConfigObj()
     let metronome = reader.readMetronome()
     let metronomeContracts = parser.parseMetronome(metronome)
     // create chain object to get contracts
@@ -25,7 +47,6 @@ function initContracts () {
     // ETC setup and init
     etcBuyer = await setupAccount(etcChain.web3)
     await configureChain(etcChain, ethChain)
-
     resolve({
       ethChain: ethChain,
       ethBuyer: ethBuyer,
@@ -35,15 +56,31 @@ function initContracts () {
   })
 }
 
+function createConfigObj () {
+  config = { eth: {}, etc: {} }
+  config.eth.chainName = 'ETH'
+  config.eth.httpURL = process.env.eth_http_url
+  config.eth.wsURL = process.env.eth_ws_url
+  config.eth.address = process.env.eth_validator_address
+  config.eth.password = process.env.eth_validator_password
+
+  config.etc.chainName = 'ETC'
+  config.etc.httpURL = process.env.etc_http_url
+  config.etc.wsURL = process.env.etc_ws_url
+  config.etc.address = process.env.etc_validator_address
+  config.etc.password = process.env.etc_validator_password
+  return config
+}
+
 // Create account and send some ether in it
 async function setupAccount (web3) {
-  let accounts = await web3.eth.getAccounts()
+  // let accounts = await web3.eth.getAccounts()
   let user = await web3.eth.personal.newAccount('password')
-  await web3.eth.personal.unlockAccount(accounts[0], '')
+  await web3.eth.personal.unlockAccount(config.etc.address, config.etc.password)
   await web3.eth.sendTransaction({
     to: user,
-    from: accounts[0],
-    value: 2e20
+    from: config.etc.address,
+    value: 2e18
   })
   return user
 }
@@ -65,9 +102,6 @@ async function configureChain (chain, destChain) {
       .addDestinationChain(destChainName, destTokanAddress)
       .send({ from: owner })
   }
-  await chain.contracts.validator.methods
-    .updateThreshold(1)
-    .send({ from: owner })
 }
 
 // Prepare import data using export receipt
@@ -76,7 +110,7 @@ async function prepareImportData (chain, receipt) {
   let i = 0
   var filter = { transactionHash: receipt.transactionHash }
   var logExportReceipt = await chain.contracts.tokenPorter.getPastEvents(
-    'ExportReceiptLog',
+    'LogExportReceipt',
     { filter, fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber }
   )
   const returnValues = logExportReceipt[0].returnValues
@@ -90,6 +124,8 @@ async function prepareImportData (chain, receipt) {
     )
     i++
   }
+  let genesisTime = await chain.contracts.auctions.methods.genesisTime().call()
+  let dailyAuctionStartTime = await chain.contracts.auctions.methods.dailyAuctionStartTime().call()
   return {
     addresses: [
       returnValues.destinationMetronomeAddr,
@@ -101,15 +137,26 @@ async function prepareImportData (chain, receipt) {
       ethers.utils.bigNumberify(returnValues.amountToBurn),
       ethers.utils.bigNumberify(returnValues.fee),
       ethers.utils.bigNumberify(returnValues.currentTick),
-      ethers.utils.bigNumberify(returnValues.genesisTime),
+      ethers.utils.bigNumberify(genesisTime),
       ethers.utils.bigNumberify(returnValues.dailyMintable),
       ethers.utils.bigNumberify(returnValues.burnSequence),
-      ethers.utils.bigNumberify(returnValues.dailyAuctionStartTime)
+      ethers.utils.bigNumberify(dailyAuctionStartTime)
     ],
     root: getMerkleRoot(burnHashes),
     extraData: returnValues.extraData,
     supplyOnAllChains: returnValues.supplyOnAllChains,
     destinationChain: returnValues.destinationChain
+  }
+}
+
+async function mineBlocks (chain, count, recepient) {
+  for (let i = 0; i < count; i++) {
+    await chain.web3.eth.sendTransaction({
+      to: recepient,
+      from: recepient,
+      value: 10
+    })
+    console.log('Block height', await chain.web3.eth.getBlockNumber())
   }
 }
 
@@ -176,4 +223,4 @@ function getMerkleRoot (hashes) {
   return '0x' + tree.getRoot().toString('hex')
 }
 
-module.exports = { initContracts, prepareImportData, getMET }
+module.exports = { initContracts, prepareImportData, getMET, mineBlocks }
