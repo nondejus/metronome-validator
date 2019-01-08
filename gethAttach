@@ -114,7 +114,7 @@ then
      DATADIR=./parity/devnet/eth
      DEST="New Alchemy ETH devnet"
      CHAINARG="--chain devnet-eth.json"
-     BOOTNODES="--bootnodes enode://c84b1142224c2cd8c448ca2c6ff131285b334985af0c57e8d18652265c5a7c80447d6f3f9d393efe4e666b5bcbb1e2266066102453e1a489a23a64d7e2163016@35.229.86.198:33333"
+     BOOTNODES="--bootnodes enode://c84b1142224c2cd8c448ca2c6ff131285b334985af0c57e8d18652265c5a7c80447d6f3f9d393efe4e666b5bcbb1e2266066102453e1a489a23a64d7e2163016@35.231.151.34:33333"
   else
     DATADIR=/tmp/parity/local/eth
     DEST="Parity DevChain Local ETH"
