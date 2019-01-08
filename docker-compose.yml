@@ -1,11 +1,14 @@
-version: '3'
+version: '3.2'
 
 services:
   valiator:
     image: patidarmanoj/metronome-validator:latest
     command: node index.js launch
     volumes:
-      - .:/usr/src/metronome-validator
+      - type: bind
+        source: ./validator.env
+        target: /usr/src/metronome-validator/validator.env
+      # - .:/usr/src/metronome-validator
     network_mode: host
     depends_on: 
       - redis-server

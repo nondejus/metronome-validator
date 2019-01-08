@@ -80,7 +80,7 @@ async function setupAccount (web3) {
   await web3.eth.sendTransaction({
     to: user,
     from: config.etc.address,
-    value: 2e20
+    value: 2e18
   })
   return user
 }

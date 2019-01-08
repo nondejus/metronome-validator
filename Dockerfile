@@ -1,4 +1,4 @@
-FROM patidarmanoj/metronome-base
+FROM patidarmanoj/metronome-base:latest
 
 WORKDIR /usr/src/metronome-validator
 COPY . .
