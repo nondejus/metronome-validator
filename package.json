@@ -8,6 +8,7 @@
     "metronome-validator": "index.js"
   },
   "scripts": {
+    "docker:build": "docker build -t metronome-validator .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "testValidator": "./node_modules/mocha/bin/mocha ./test/testExportImport.js --timeout 1000000 --exit"
   },

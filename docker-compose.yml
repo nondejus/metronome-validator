@@ -2,8 +2,7 @@ version: '3.2'
 
 services:
   valiator:
-    image: patidarmanoj/metronome-validator:latest
-    command: node index.js launch
+    image: metronome-validator:latest
     volumes:
       - type: bind
         source: ./validator.env

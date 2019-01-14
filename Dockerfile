@@ -1,6 +1,20 @@
-FROM patidarmanoj/metronome-base:latest
+FROM ubuntu:18.04
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git
+
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+RUN apt-get install -y nodejs
 
 WORKDIR /usr/src/metronome-validator
-COPY . .
+COPY package.json .
+COPY package-lock.json .
 RUN npm install
-CMD tail -f /dev/null
+# Install dependencies again to ensure all packages are available
+RUN npm install
+COPY . .
+RUN rm validator.env
+
+CMD ["node", "index.js", "launch"]
