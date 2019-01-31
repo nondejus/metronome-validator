@@ -53,7 +53,7 @@ function launchValidator (ethPassword, etcPassword) {
 }
 
 function createConfigObj () {
-  var config = { eth: {}, etc: {} }
+  var config = { eth: {}, etc: {}, qtum: {} }
   config.eth.chainName = 'ETH'
   config.eth.httpURL = process.env.eth_http_url
   config.eth.wsURL = process.env.eth_ws_url
@@ -65,6 +65,12 @@ function createConfigObj () {
   config.etc.wsURL = process.env.etc_ws_url
   config.etc.address = process.env.etc_validator_address
   config.etc.password = process.env.etc_validator_password
+
+  config.qtum.chainName = 'QTUM'
+  config.qtum.httpURL = process.env.qtum_http_url
+  config.qtum.wsURL = process.env.qtum_ws_url
+  config.qtum.address = process.env.qtum_validator_address
+  config.qtum.password = process.env.qtum_validator_password
   return config
 }
 
