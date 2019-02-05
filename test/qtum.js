@@ -90,6 +90,7 @@ describe('cross chain testing', () => {
       let metBalance = await ethChain.contracts.metToken.methods
         .balanceOf(ethBuyer)
         .call()
+      console.log('metBalance', metBalance)
       assert(metBalance > 0, 'Exporter has no MET token balance')
       metBalance = ethers.utils.bigNumberify(metBalance)
       let fee = metBalance.div(2)
@@ -150,7 +151,6 @@ describe('cross chain testing', () => {
       let expectedBalanceOfRecepient = qBalance.add(importDataObj.importData[1])
       console.log('importing in qtum - test 1')
       try {
-        console.log('import sequence', (await qChain.contracts.tokenPorter.call('importSequence')).outputs[0].toString())
         let tx = await qChain.contracts.metToken.send('importMET', [
           ethChain.web3.utils.toHex('ETH'),
           importDataObj.destinationChain,
@@ -163,7 +163,6 @@ describe('cross chain testing', () => {
         )
         console.log('tx', tx)
         await tx.confirm(1)
-        console.log('import sequence', (await qChain.contracts.tokenPorter.call('importSequence')).outputs[0].toString())
         resolve()
       } catch (error) {
         return reject(error)
