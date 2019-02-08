@@ -1159,9 +1159,9 @@
       "binhash": "1fdcf3235eb33f324e3d4d937690723f79fe279f06f2c76ae36fd92fb2fb33e6",
       "name": "Auctions",
       "deployName": "Auctions",
-      "address": "2e6e1c242b4795d965cebfd2e080e8f27c11387a",
-      "txid": "e9cf739752489c7f65fc8880e506edc7c8ba8b07e154ff7fbb726f9156ee06b2",
-      "createdAt": "2019-02-02T01:26:33.0740795Z",
+      "address": "3a673aa1c0c6e303b7799ee30a4e392416e8828a",
+      "txid": "d3330117384f3749a326d20547e56c7026ca2b886102bf80eda95c4fd69e3c4e",
+      "createdAt": "2019-02-05T00:47:41.6114889Z",
       "confirmed": true,
       "sender": "qYoQMnchVU5kuUrAH8fiihj1AngrCxShoC",
       "senderHex": "a730b6d440df0c14dd40a17be09f964744d2580a"
@@ -1528,9 +1528,9 @@
       "binhash": "1c838d6f9a7f04816f7346bdb068456836670f6ad0a7d11f8e679f942e275b42",
       "name": "AutonomousConverter",
       "deployName": "AutonomousConverter",
-      "address": "60fc620ca9e5d5e15176876fcad1a57dfb457e44",
-      "txid": "a33ac1c7f2cf4b3b7be2fe492a7921099009b4b10e5fc30392e37b3751f903f3",
-      "createdAt": "2019-02-02T01:26:38.9638048Z",
+      "address": "ffad01cad73b2001402e2aef1c365f7071f0d079",
+      "txid": "8a0754902fe057695f444912867367d500ef4ed8e2c01c011857725f44e5866e",
+      "createdAt": "2019-02-05T00:48:09.5120352Z",
       "confirmed": true,
       "sender": "qYoQMnchVU5kuUrAH8fiihj1AngrCxShoC",
       "senderHex": "a730b6d440df0c14dd40a17be09f964744d2580a"
@@ -2637,9 +2637,9 @@
       "binhash": "d660602872a2a865bc230bfa72fb01d83bfd3b292ad7340d88cc4c3785022b86",
       "name": "METToken",
       "deployName": "METToken",
-      "address": "34db3db1f72acb4c8e8bec43225fc5a1b793fbe2",
-      "txid": "1256640569dbf566e1a1527f0c2fb1b0231a726e2fe48c443beb021c08de9b39",
-      "createdAt": "2019-02-02T01:26:50.0426825Z",
+      "address": "352f4ba6a9462e5dc8d2c4f6b336f7f7dbfe160e",
+      "txid": "c97edc78df09ded2b51a1a1f094e5454285fc1a9edb3fabc9dafaa29381a7fdd",
+      "createdAt": "2019-02-05T00:48:39.0959334Z",
       "confirmed": true,
       "sender": "qYoQMnchVU5kuUrAH8fiihj1AngrCxShoC",
       "senderHex": "a730b6d440df0c14dd40a17be09f964744d2580a"
@@ -2846,9 +2846,9 @@
       "binhash": "9dd1bbe7fa2e881774f4784e42c16d09dc6671aec6acd2a1b976cc2d59f5d0a5",
       "name": "Proceeds",
       "deployName": "Proceeds",
-      "address": "2064e170100c7e3a26e57af704307fe997761358",
-      "txid": "027f406cd2bf51941f6e273c6e14831ef074fe48c3b34a25107e033ee61c0bed",
-      "createdAt": "2019-02-02T01:26:19.0523472Z",
+      "address": "d8d4da8892aea97a5cf460fb6801b20ee35d0ce5",
+      "txid": "96d3136e418a0546af6d502b17f8fcd116b60666fa5d145d485cda20f4bbac6c",
+      "createdAt": "2019-02-05T00:47:29.7150792Z",
       "confirmed": true,
       "sender": "qYoQMnchVU5kuUrAH8fiihj1AngrCxShoC",
       "senderHex": "a730b6d440df0c14dd40a17be09f964744d2580a"
@@ -3221,9 +3221,9 @@
       "binhash": "22a02bd0e9044ea6958528af5068bd654538acdeea5b6d809c9e9ef0eb95364e",
       "name": "SmartToken",
       "deployName": "SmartToken",
-      "address": "1a2a91692960a13c71f96a5e21d6fa97b064d958",
-      "txid": "e32cf6143ea645ccd144e42e2c6a14c31b2197474bb3c022b61461448b91695e",
-      "createdAt": "2019-02-02T01:26:44.2993321Z",
+      "address": "9e50f5fee21c686ce09df14faff4341bd38ac750",
+      "txid": "ddcfc7aba0b2d50fcad572a7b1810f8dfd77d6e92dea41685e71e99d1693d114",
+      "createdAt": "2019-02-05T00:48:28.4844763Z",
       "confirmed": true,
       "sender": "qYoQMnchVU5kuUrAH8fiihj1AngrCxShoC",
       "senderHex": "a730b6d440df0c14dd40a17be09f964744d2580a"
@@ -4098,9 +4098,9 @@
       "binhash": "df1112c8e0e3818892a62f5a0465b9aae62ffe0a4bcb0d32bd767b368ab33ed9",
       "name": "TokenPorter",
       "deployName": "TokenPorter",
-      "address": "c60d3623b53081b95edaf7a45b1ccab237b31526",
-      "txid": "96bb3e2f2a5f020769d90b4e70bc6ec5ae534de9e163bbe19be1d2e7d3b8a94e",
-      "createdAt": "2019-02-02T01:26:56.6474109Z",
+      "address": "71c5855678bc78585cf97ba7e2b035f82dfe1c1c",
+      "txid": "7f27dfded78630cabc31285268ea40b9efb14b5a0d10328f0c7a0e3805240d97",
+      "createdAt": "2019-02-05T00:48:50.3770944Z",
       "confirmed": true,
       "sender": "qYoQMnchVU5kuUrAH8fiihj1AngrCxShoC",
       "senderHex": "a730b6d440df0c14dd40a17be09f964744d2580a"
@@ -4602,12 +4602,100 @@
       "binhash": "90373454726dbd5ce57ec91e11c1d5d9f52a13b4f5fb6f44d1578517423f0d58",
       "name": "Validator",
       "deployName": "Validator",
-      "address": "60fbbbeefbf88a342acb7fc326df8e6d29317878",
-      "txid": "33a40809918f45cb49e424cc0c575f130fcbfecc08bc8349c921c0c638b3d8cb",
-      "createdAt": "2019-02-02T01:27:02.8740142Z",
+      "address": "1393f670799e33567415a31c3a4e36c132662a82",
+      "txid": "ab1e8aece897a5c3ee43627cf9c96147d1579215a7d97ebe3bd8bbcd6effd7f6",
+      "createdAt": "2019-02-05T00:49:24.3322749Z",
       "confirmed": true,
       "sender": "qYoQMnchVU5kuUrAH8fiihj1AngrCxShoC",
       "senderHex": "a730b6d440df0c14dd40a17be09f964744d2580a"
+    },
+    "./contracts/temp/EventTest.sol": {
+      "source": "./contracts/temp/EventTest.sol:EventTest",
+      "abi": [
+        {
+          "name": "updateVaue",
+          "type": "function",
+          "payable": false,
+          "inputs": [
+            {
+              "name": "_v",
+              "type": "uint256",
+              "indexed": false
+            }
+          ],
+          "outputs": [],
+          "constant": false,
+          "anonymous": false
+        },
+        {
+          "name": "sendQtum",
+          "type": "function",
+          "payable": true,
+          "inputs": [],
+          "outputs": [],
+          "constant": false,
+          "anonymous": false
+        },
+        {
+          "name": "",
+          "type": "fallback",
+          "payable": true,
+          "inputs": null,
+          "outputs": null,
+          "constant": false,
+          "anonymous": false
+        },
+        {
+          "name": "ValueUpdated",
+          "type": "event",
+          "payable": false,
+          "inputs": [
+            {
+              "name": "amount",
+              "type": "uint256",
+              "indexed": true
+            },
+            {
+              "name": "purchasePrice",
+              "type": "uint256",
+              "indexed": false
+            }
+          ],
+          "outputs": null,
+          "constant": false,
+          "anonymous": false
+        },
+        {
+          "name": "Moneyupdated",
+          "type": "event",
+          "payable": false,
+          "inputs": [
+            {
+              "name": "amount",
+              "type": "uint256",
+              "indexed": true
+            },
+            {
+              "name": "purchasePrice",
+              "type": "uint256",
+              "indexed": false
+            }
+          ],
+          "outputs": null,
+          "constant": false,
+          "anonymous": false
+        }
+      ],
+      "bin": "6060604052600a6000556014600155341561001957600080fd5b610149806100286000396000f30060606040526004361061004b5763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663da9247d48114610086578063e0d3a9631461009e575b3460018190557f6322e4de1e081e46fd467af5c0ac2ed8aef43c37358a53f8868b492bf8ed70078160405190815260200160405180910390a2005b341561009157600080fd5b61009c6004356100a6565b005b61009c6100e2565b6000819055807f253ac2c290fb3c37b20cfd60899ed86c0c8313905edc8ca53ec8d2b69d9919ad8160405190815260200160405180910390a250565b3460018190557f6322e4de1e081e46fd467af5c0ac2ed8aef43c37358a53f8868b492bf8ed70078160405190815260200160405180910390a25600a165627a7a72305820c7921d55a9a443afd5c30f47fc9c189ecf1c4d5902586445dea58b2c23824bed0029",
+      "binhash": "a55f9c4b0601c2b72ff9ffd86a1301ae8f147b7ce9d33a7800e7628762514fab",
+      "name": "EventTest",
+      "deployName": "./contracts/temp/EventTest.sol",
+      "address": "f237de6ed99a1ee5e3a71bcece7d46d5181338d8",
+      "txid": "f750169a09c7de2e67bfb3b7b6b956248eb5f13ee0e7bfc54c4f659ee97744d7",
+      "createdAt": "2019-02-04T19:27:05.0977129Z",
+      "confirmed": true,
+      "sender": "qPUFNtZP6t5GHRnHkiXcQkXZ5Uc92fKK2B",
+      "senderHex": "40d82e9094c1599661a48c9db149d63d31f110ff"
     },
     "./contracts/temp/token/CappedToken.sol": {
       "source": "./contracts/temp/token/CappedToken.sol:CappedToken",
