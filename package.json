@@ -11,7 +11,7 @@
     "docker:build": "docker build -t metronome-validator .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "testValidator": "./node_modules/mocha/bin/mocha ./test/testExportImport.js --timeout 1000000 --exit",
-    "testQtum": "./node_modules/mocha/bin/mocha ./test/qtum.js --timeout 1000000 --exit"
+    "testQtum": "./node_modules/mocha/bin/mocha ./test/qtum.js --timeout 10000000 --exit",
   },
   "author": "",
   "license": "MIT",

@@ -178,7 +178,7 @@
     "type": "event"
    }
   ],
-  "address": "0xabfb361cbcb10d1cac349f9565f1a0f60076faec"
+  "address": "0xfe7dc97c4695c3442f8a5af590f9e031e183bf00"
  },
  "Auctions": {
   "abi": [
@@ -1143,7 +1143,7 @@
     "type": "event"
    }
   ],
-  "address": "0xea0f7fcc083a9b7e5b90d6711fe4cc262f65b16f"
+  "address": "0x02ff7df6c76dd395faf86668cce5936a1a769b75"
  },
  "AutonomousConverter": {
   "abi": [
@@ -1468,7 +1468,7 @@
     "type": "event"
    }
   ],
-  "address": "0xb390d71d527a9eb8ff6088a096b16e15e3bf0b08"
+  "address": "0xe2bd1d3d52e3190bff19883dfd2b12e31027e42f"
  },
  "SmartToken": {
   "abi": [
@@ -1795,7 +1795,7 @@
     "type": "event"
    }
   ],
-  "address": "0xa4e2fe914d10d95eaf8af0c43a12ff0aea64c1a8"
+  "address": "0x20eb92705c2ed27c6db83e76a81ad0b9e38e6de0"
  },
  "METToken": {
   "abi": [
@@ -2769,7 +2769,7 @@
     "type": "event"
    }
   ],
-  "address": "0x614694cf41247e87f499f8ba1ae895cb4e880762"
+  "address": "0x5da10980a4fc376d5296b2a2f2fb36d8a520c31b"
  },
  "TokenPorter": {
   "abi": [
@@ -3553,7 +3553,7 @@
     "type": "event"
    }
   ],
-  "address": "0x6d93e19cf75350fa0536eab3aa3106ca5715858f"
+  "address": "0x19fd547127993c3984cd3bacaa475326b49e3543"
  },
  "Validator": {
   "abi": [
@@ -3998,6 +3998,6 @@
     "type": "event"
    }
   ],
-  "address": "0xbc3548ddeb134c24c3c1193bb3654b41da3491d0"
+  "address": "0x70656c9bc20b3e603e6638b36c92b117f4120974"
  }
 }

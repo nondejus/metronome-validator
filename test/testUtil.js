@@ -28,6 +28,7 @@ const MerkleTreeJs = require('merkletreejs')
 const crypto = require('crypto')
 const reader = require('../lib/file-reader')
 const Chain = require('../lib/chain')
+const QChain = require('../lib/qChain')
 require('dotenv').config()
 var config
 // create contract object from abi
@@ -39,12 +40,11 @@ function initContracts () {
     // create chain object to get contracts
     ethChain = new Chain(config.eth, metronomeContracts.eth)
     etcChain = new Chain(config.etc, metronomeContracts.etc)
-    qChain = new Chain(config.qtum, metronomeContracts.qtum)
-    console.log('qtum auction running', (await qChain.contracts.auctions.call('isRunning')).outputs[0])
+    qChain = new QChain(config.qtum, metronomeContracts.qtum)
     resolve({
-      ethChain: ethChain,
-      qChain: qChain,
-      etcChain: etcChain
+      ETH: ethChain,
+      QTUM: qChain,
+      ETC: etcChain
     })
   })
 }
@@ -104,21 +104,10 @@ async function configureChain (chain, destChain) {
 }
 
 // Prepare import data using export receipt
-async function prepareImportData (chain, burnHash, txHash) {
-  var filter
-  if (!burnHash && burnHash) {
-    filter = { currentBurnHash: burnHash }
-  } else {
-    filter = { transactionHash: txHash }
-  }
+async function prepareImportData (chain, options) {
   let burnHashes = []
   let i = 0
-  filter = { currentBurnHash: burnHash }
-  var logExportReceipt = await chain.contracts.tokenPorter.getPastEvents(
-    'LogExportReceipt',
-    { filter, fromBlock: 0, toBlock: 'latest' }
-  )
-  console.log('length', logExportReceipt.length)
+  var logExportReceipt = await chain.getPastExportReceipts(options)
   const returnValues = logExportReceipt[0].returnValues
 
   if (returnValues.burnSequence > 15) {
@@ -131,7 +120,7 @@ async function prepareImportData (chain, burnHash, txHash) {
     i++
   }
   let genesisTime = await chain.contracts.auctions.methods.genesisTime().call()
-  let dailyAuctionStartTime = await chain.contracts.auctions.methods.dailyAuctionStartTime().call()
+  let dailyAuctionStartTime = await chain.call(chain.contracts.auctions, 'dailyAuctionStartTime', [])
   return {
     addresses: [
       returnValues.destinationMetronomeAddr,
@@ -162,7 +151,6 @@ async function mineBlocks (chain, count, recepient) {
       from: recepient,
       value: 10
     })
-    console.log('Block height', await chain.web3.eth.getBlockNumber())
   }
 }
 
@@ -171,35 +159,14 @@ async function getMET (chain, recepient) {
     .balanceOf(recepient)
     .call()
   metBalance = ethers.utils.bigNumberify(metBalance)
-  console.log(metBalance)
-  console.log(await chain.contracts.metToken.methods
-    .balanceOf('0x4677e4a3b7d50c5f27de4b71500cf71d1fa0f172')
-    .call())
-  console.log(await chain.contracts.metToken.methods
-    .balanceOf('0x5075AD5D99ffCeD89CdB1295e04D5a2eFf2e54F6')
-    .call())
-  console.log(await chain.contracts.metToken.methods
-    .balanceOf('0xCba4e61E82773703DB7998873414C5565c0BE41a')
-    .call())
-  console.log(await chain.contracts.metToken.methods
-    .balanceOf('0x5f9dcaeDEF4dC1D8476c681c00666D2CC25d8f5f')
-    .call())
-  console.log(await chain.contracts.metToken.methods
-    .balanceOf('0x295BDa92E2Ebe891F86de4b5D3298F59202909fb')
-    .call())
-  console.log(await chain.contracts.metToken.methods
-    .balanceOf('0xAE4E3Af55872601461897D82ce4165ba635C50a1')
-    .call())
   if (metBalance.gt(ethers.utils.bigNumberify('1000000000000000'))) {
     return
   }
-  console.log('buying from AC')
   var web3 = chain.web3
   let mintable = await chain.contracts.auctions.methods
     .mintable()
     .call()
   mintable = ethers.utils.bigNumberify(mintable)
-  console.log('mintable', mintable)
   if (mintable.gt(ethers.utils.bigNumberify('10000000000000000000'))) {
     await web3.eth.sendTransaction({
       to: chain.contracts.auctions.options.address,
