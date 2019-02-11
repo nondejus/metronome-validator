@@ -178,7 +178,7 @@
     "type": "event"
    }
   ],
-  "address": "0xa2e31b40e18784cd60f69cc72ba18aa5faa1b68d"
+  "address": "0xa5544906cd3ae55eeb89a0a552405370066d1554"
  },
  "Auctions": {
   "abi": [
@@ -1209,7 +1209,7 @@
     "type": "event"
    }
   ],
-  "address": "0x1702219249aca4703f98099a9ecb256a7243714a"
+  "address": "0x0377f6c3f2fcf247f88f613e68b1af90c780d91d"
  },
  "AutonomousConverter": {
   "abi": [
@@ -1534,7 +1534,7 @@
     "type": "event"
    }
   ],
-  "address": "0x45f9a0fdeee4ae51c10b6d0fa2942b1b7f31d18d"
+  "address": "0x5f1be3ab8fa86fdd970dd6be35155691933765c3"
  },
  "SmartToken": {
   "abi": [
@@ -1861,7 +1861,7 @@
     "type": "event"
    }
   ],
-  "address": "0x1bb760be61ecedf97c7eca1d715b58af22f4ec47"
+  "address": "0x21791e1b840fca86f62ad00a79ddf0f38c2e6043"
  },
  "METToken": {
   "abi": [
@@ -2835,7 +2835,7 @@
     "type": "event"
    }
   ],
-  "address": "0x6545345c8bb9e86a169701c93ce06976530594c9"
+  "address": "0x412bead4f75ecd285e09da74552d5dac5098d17f"
  },
  "TokenPorter": {
   "abi": [
@@ -3412,28 +3412,6 @@
     "anonymous": false,
     "inputs": [
      {
-      "indexed": true,
-      "name": "destinationMetronomeAddr",
-      "type": "address"
-     },
-     {
-      "indexed": true,
-      "name": "destinationRecipientAddr",
-      "type": "address"
-     },
-     {
-      "indexed": false,
-      "name": "amount",
-      "type": "uint256"
-     }
-    ],
-    "name": "ExportOnChainClaimedReceiptLog",
-    "type": "event"
-   },
-   {
-    "anonymous": false,
-    "inputs": [
-     {
       "indexed": false,
       "name": "destinationChain",
       "type": "bytes8"
@@ -3617,9 +3595,31 @@
     ],
     "name": "OwnershipChanged",
     "type": "event"
+   },
+   {
+    "anonymous": false,
+    "inputs": [
+     {
+      "indexed": true,
+      "name": "destinationMetronomeAddr",
+      "type": "address"
+     },
+     {
+      "indexed": true,
+      "name": "destinationRecipientAddr",
+      "type": "address"
+     },
+     {
+      "indexed": false,
+      "name": "amount",
+      "type": "uint256"
+     }
+    ],
+    "name": "ExportOnChainClaimedReceiptLog",
+    "type": "event"
    }
   ],
-  "address": "0xed98de996a22f6bb14bca3d0b976257cf6beed04"
+  "address": "0xc5e4f80954a6182d64ebadfd94178fed5a5dc24c"
  },
  "Validator": {
   "abi": [
@@ -4064,6 +4064,6 @@
     "type": "event"
    }
   ],
-  "address": "0xcc938030b0ee34d2d10a9b3ea065ed335278a4e7"
+  "address": "0x72b0cd397ee07466f7d04b63c0f2bbbae0e037da"
  }
 }

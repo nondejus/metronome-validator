@@ -39,10 +39,10 @@ check_system()
 
   parityString=`parity --version | grep version\ P`
   parityVersion=${parityString:18:3}  
-  if [[ "$parityString" = *"2.2.7"* ]]; then
-    echo "You have Parity 2.2.7"
+  if [[ "$parityString" = *"2.3.2"* ]]; then
+    echo "You have Parity 2.3.2"
   else
-    echo "Need Parity 2.2.7 - You have $parityString. Punting."
+    echo "Need Parity 2.3.2 - You have $parityString. Punting."
     exit 1
   fi
 
