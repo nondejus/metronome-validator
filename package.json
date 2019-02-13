@@ -10,8 +10,9 @@
   "scripts": {
     "docker:build": "docker build -t metronome-validator .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "testValidator": "./node_modules/mocha/bin/mocha ./test/testExportImport.js --timeout 1000000 --exit",
-    "testQtum": "./node_modules/mocha/bin/mocha ./test/qtum.js --timeout 10000000 --exit",
+    "testValidator": "./node_modules/.bin/mocha ./test/testExportImport.js --timeout 1000000 && exit 1",
+    "testQtumImport": "./node_modules/.bin/mocha ./test/qtumImport.js --timeout 100000 && exit 1",
+    "testQtumExport": "./node_modules/.bin/mocha ./test/qtumExport.js --timeout 100000 && exit 1"
   },
   "author": "",
   "license": "MIT",

@@ -23,57 +23,27 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 const assert = require('chai').assert
-const _ = require('lodash')
-const fs = require('fs')
 const ethers = require('ethers')
 const util = require('./testUtil')
-const validator = require('../lib/validator')
+const Validator = require('../lib/validator')
 require('dotenv').config()
 
 var ethBuyer = process.env.eth_validator_address
 var ethPassword = process.env.eth_validator_password
 
-var ethChain, qChain
-
-async function validateMinting (
-  chain,
-  recipient,
-  expectedTotalSupply,
-  expectedBalanceOfRecepient
-) {
-  let currentTotalSupply = await chain.contracts.metToken.methods
-    .totalSupply()
-    .call()
-  currentTotalSupply = ethers.utils.bigNumberify(
-    ethChain.web3.utils.toHex(currentTotalSupply)
-  )
-  var diff = expectedTotalSupply.sub(currentTotalSupply)
-  assert.closeTo(diff.toNumber(), 0, 3, 'Total supply is wrong after import')
-  let balanceOfRecepient = await chain.contracts.metToken.methods
-    .balanceOf(recipient)
-    .call()
-  assert.equal(
-    balanceOfRecepient,
-    expectedBalanceOfRecepient.toString(10),
-    'Balance of recepient wrong after import'
-  )
-}
-
-const getDataForImport = _.memoize(function () {
-  return fs.readFileSync('import-data.json').toString()
-})
+var ethChain, qChain, chains
 
 before(async () => {
-  const response = await util.initContracts()
-  ethChain = response.ETH
-  qChain = response.QTUM
+  chains = await util.initContracts()
+  ethChain = chains.ETH
+  qChain = chains.QTUM
 })
 
-describe('Export test 1. ETH to QTUM', () => {
+describe('Export test- ETH to QTUM', () => {
   var metBalance
   var receipt = ''
   var fee = ethers.utils.bigNumberify(2e14)
-  var amount = ethers.utils.bigNumberify(1e14)
+  var amount = ethers.utils.bigNumberify(4e14)
   var extraData = 'D'
 
   before(async () => {
@@ -91,6 +61,8 @@ describe('Export test 1. ETH to QTUM', () => {
 
   it('Should be able to export from eth', () => {
     return new Promise(async (resolve, reject) => {
+      let recepient = await qChain.qtum.rawCall('gethexaddress', [process.env.qtum_validator_address])
+      recepient = '0x' + recepient
       let totalSupplybefore = await ethChain.contracts.metToken.methods
         .totalSupply()
         .call()
@@ -100,12 +72,11 @@ describe('Export test 1. ETH to QTUM', () => {
         receipt = await ethChain.contracts.metToken.methods.export(
           ethChain.web3.utils.toHex('qtum'),
           qChain.contracts.metToken.info.address,
-          '0xa730b6d440df0c14dd40a17be09f964744d2580a',
+          recepient,
           amount,
           fee,
           ethChain.web3.utils.toHex(extraData)
         ).send({ from: ethBuyer })
-        console.log('receipt', receipt)
       } catch (error) {
         console.log('error', error)
         return reject(error)
@@ -124,14 +95,12 @@ describe('Export test 1. ETH to QTUM', () => {
 
   it('Should be able to submit import request in qtum', () => {
     return new Promise(async (resolve, reject) => {
-      console.log('preparing import data')
       var filter = {}
-      var burnHash = '0xa51675480858c4f492752ba63ba3a102da1400baca2c54ae3e6378767b74050f'
-      filter = { currentBurnHash: burnHash }
-      var options = { filter, fromBlock: '0', toBlock: 'latest' }
-      // var options = { filter, fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber }
+      // var burnHash = '0xa51675480858c4f492752ba63ba3a102da1400baca2c54ae3e6378767b74050f'
+      // filter = { currentBurnHash: burnHash }
+      // var options = { filter, fromBlock: '0', toBlock: 'latest' }
+      var options = { filter, fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber }
       let importDataObj = await util.prepareImportData(ethChain, options)
-      console.log('importDataObj', importDataObj)
       try {
         await qChain.send(qChain.contracts.metToken, 'importMET', [
           ethChain.web3.utils.toHex('ETH'),
@@ -143,8 +112,8 @@ describe('Export test 1. ETH to QTUM', () => {
           importDataObj.importData,
           importDataObj.root]
         )
-        let root = await qChain.call(qChain.contracts.tokenPorter, 'merkleRoots')
-        console.log('root', root)
+        let root = await qChain.call(qChain.contracts.tokenPorter, 'merkleRoots', [importDataObj.burnHashes[1]])
+        root = '0x' + root
         assert.equal(root, importDataObj.root, 'Import request is failed')
         resolve()
       } catch (error) {
@@ -153,13 +122,31 @@ describe('Export test 1. ETH to QTUM', () => {
     })
   })
 
-  it('Validator should be able to attest', () => {
+  it('Should be able to validate and attest export receipt in qtum', () => {
     return new Promise(async (resolve, reject) => {
-      qChain.contracts.validator.logEmitter({ minconf: 0 })
-        .on('attestHash', (event) => {
-          console.log('event', event)
-          // TODO: assert and resolve
-        })
+      var validator = new Validator(chains, qChain)
+      var filter = {}
+      var options = { filter, fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber }
+      var logExportReceipt = await ethChain.getPastExportReceipts(options)
+      const returnValues = logExportReceipt[0].returnValues
+      let originChain = 'ETH'
+      let response = await validator.validateHash(originChain, returnValues.currentBurnHash)
+      assert(response.hashExist, 'Validations failed')
+      let attstBefore = await qChain.call(qChain.contracts.validator, 'attestationCount', [returnValues.currentBurnHash])
+      let balanceBefore = await qChain.call(qChain.contracts.metToken, 'balanceOf', [returnValues.destinationRecipientAddr])
+      await validator.attestHash(originChain, returnValues)
+      let attstAfter = await qChain.call(qChain.contracts.validator, 'attestationCount', [returnValues.currentBurnHash])
+      assert(attstAfter, attstBefore + 1, 'attestation failed')
+      let threshold = await qChain.call(qChain.contracts.validator, 'threshold')
+      if (threshold.toString() === '1') {
+        let hashClaimed = await qChain.call(qChain.contracts.validator, 'hashClaimed', [returnValues.currentBurnHash])
+        assert(hashClaimed, 'Minting failed after attestation')
+        let balanceAfter = await qChain.call(qChain.contracts.metToken, 'balanceOf', [returnValues.destinationRecipientAddr])
+        balanceAfter = ethers.utils.bigNumberify(balanceAfter.toString())
+        balanceBefore = ethers.utils.bigNumberify(balanceBefore.toString())
+        assert(balanceAfter.eq(balanceBefore.add(amount)))
+      }
+      resolve()
     })
   })
 })
