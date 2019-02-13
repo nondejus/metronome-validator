@@ -34,30 +34,22 @@ var config
 // create contract object from abi
 function initContracts () {
   return new Promise(async (resolve, reject) => {
-    let ethChain, etcChain, ethBuyer, etcBuyer
+    let ethChain, etcChain
     var config = createConfigObj()
     let metronome = reader.readMetronome()
     let metronomeContracts = parser.parseMetronome(metronome)
     // create chain object to get contracts
     ethChain = new Chain(config.eth, metronomeContracts.eth)
     etcChain = new Chain(config.etc, metronomeContracts.etc)
-    // ETH setup and init
-    ethBuyer = await setupAccount(ethChain.web3)
-    await configureChain(ethChain, etcChain)
-    // ETC setup and init
-    etcBuyer = await setupAccount(etcChain.web3)
-    await configureChain(etcChain, ethChain)
     resolve({
-      ethChain: ethChain,
-      ethBuyer: ethBuyer,
-      etcChain: etcChain,
-      etcBuyer: etcBuyer
+      ETH: ethChain,
+      ETC: etcChain
     })
   })
 }
 
 function createConfigObj () {
-  config = { eth: {}, etc: {} }
+  config = { eth: {}, etc: {}, qtum: {} }
   config.eth.chainName = 'ETH'
   config.eth.httpURL = process.env.eth_http_url
   config.eth.wsURL = process.env.eth_ws_url
@@ -69,6 +61,12 @@ function createConfigObj () {
   config.etc.wsURL = process.env.etc_ws_url
   config.etc.address = process.env.etc_validator_address
   config.etc.password = process.env.etc_validator_password
+
+  config.qtum.chainName = 'QTUM'
+  config.qtum.httpURL = process.env.qtum_http_url
+  config.qtum.wsURL = process.env.qtum_ws_url
+  config.qtum.address = process.env.qtum_validator_address
+  config.qtum.password = process.env.qtum_validator_password
   return config
 }
 
@@ -105,14 +103,10 @@ async function configureChain (chain, destChain) {
 }
 
 // Prepare import data using export receipt
-async function prepareImportData (chain, receipt) {
+async function prepareImportData (chain, options) {
   let burnHashes = []
   let i = 0
-  var filter = { transactionHash: receipt.transactionHash }
-  var logExportReceipt = await chain.contracts.tokenPorter.getPastEvents(
-    'LogExportReceipt',
-    { filter, fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber }
-  )
+  var logExportReceipt = await chain.contracts.tokenPorter.getPastEvents('LogExportReceipt', options)
   const returnValues = logExportReceipt[0].returnValues
 
   if (returnValues.burnSequence > 15) {
@@ -156,59 +150,33 @@ async function mineBlocks (chain, count, recepient) {
       from: recepient,
       value: 10
     })
-    console.log('Block height', await chain.web3.eth.getBlockNumber())
   }
 }
 
 async function getMET (chain, recepient) {
-  var web3 = chain.web3
-  let currentAuction = await chain.contracts.auctions.methods
-    .currentAuction()
+  let metBalance = await chain.contracts.metToken.methods
+    .balanceOf(recepient)
     .call()
-  if (currentAuction === '0') {
+  metBalance = ethers.utils.bigNumberify(metBalance)
+  if (metBalance.gt(ethers.utils.bigNumberify('1000000000000000'))) {
+    return
+  }
+  var web3 = chain.web3
+  let mintable = await chain.contracts.auctions.methods
+    .mintable()
+    .call()
+  mintable = ethers.utils.bigNumberify(mintable)
+  if (mintable.gt(ethers.utils.bigNumberify('10000000000000000000'))) {
     await web3.eth.sendTransaction({
       to: chain.contracts.auctions.options.address,
       from: recepient,
-      value: 2e16
+      value: 2e14
     })
     return
   }
-
-  // This is for testnet-devnet .
-  // If its old contracts and initial auction closed on testnet-devnet and mintable may be 0. try to get met by alternate sources i.e AC, transfer
-  let accounts = await web3.eth.getAccounts()
-  let metBalance = await chain.contracts.metToken.methods
-    .balanceOf(accounts[0])
-    .call()
-  metBalance = ethers.utils.bigNumberify(metBalance)
-  if (metBalance.lt(ethers.utils.bigNumberify('10000000000000000'))) {
-    // buy some met transfer to new user
-    await web3.eth.sendTransaction({
-      to: chain.contracts.auctions.options.address,
-      from: accounts[0],
-      value: 2e18
-    })
-    metBalance = await chain.contracts.metToken.methods.balanceOf(accounts[0]).call()
-    metBalance = ethers.utils.bigNumberify(metBalance)
-    if (metBalance.lt(ethers.utils.bigNumberify('10000000000000000'))) {
-      // Buy more met from AC
-      await chain.contracts.autonomousConverter.methods
-        .convertEthToMet(1)
-        .send({ from: accounts[0], value: 1e18 })
-    }
-  }
-  await chain.contracts.metToken.methods
-    .enableMETTransfers()
-    .send({ from: accounts[0] })
-    .catch(error => {
-      // Do nothing
-    })
-  await chain.contracts.metToken.methods
-    .transfer(recepient, web3.utils.toHex(1e16))
-    .send({ from: accounts[0] })
-  metBalance = await chain.contracts.metToken.methods
-    .balanceOf(recepient)
-    .call()
+  await chain.contracts.autonomousConverter.methods
+    .convertEthToMet(1)
+    .send({ from: recepient, value: 1e16 })
 }
 
 // Calculate merkle root for given hashes

@@ -27,7 +27,6 @@ const program = require('commander')
 const process = require('process')
 const reader = require('./lib/file-reader')
 const launcher = require('./lib/launcher')
-require('dotenv').config({path: 'validator.env'})
 
 function init () {
   program
