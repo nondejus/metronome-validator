@@ -4,9 +4,6 @@ services:
   valiator:
     image: metronome-validator:latest
     volumes:
-      - type: bind
-        source: ./validator.env
-        target: /usr/src/metronome-validator/validator.env
       # - .:/usr/src/metronome-validator
     network_mode: host
     depends_on: 

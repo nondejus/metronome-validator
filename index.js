@@ -26,7 +26,6 @@
 const program = require('commander')
 const reader = require('./lib/file-reader')
 const launcher = require('./lib/launcher')
-require('dotenv').config()
 
 function init () {
   program
