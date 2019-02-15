@@ -60,7 +60,7 @@ services:
     restart: always
   qtumd:
     container_name: qtumd
-    image: bloq/qtumportal
+    image: bloq/qtumd
     ports:
       - 9899:9899
       - 9888:9888

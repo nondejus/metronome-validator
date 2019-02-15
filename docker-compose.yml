@@ -1,7 +1,7 @@
 version: '3.2'
 
 services:
-  valiator:
+  validator:
     image: metronome-validator:latest
     volumes:
       # - .:/usr/src/metronome-validator
