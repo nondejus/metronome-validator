@@ -15,6 +15,6 @@ RUN npm install
 # Install dependencies again to ensure all packages are available
 RUN npm install
 COPY . .
-RUN rm validator.env
+RUN rm .env
 
 CMD ["node", "index.js", "launch"]
