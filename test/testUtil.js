@@ -57,6 +57,12 @@ function createConfigObj () {
   config.etc.wsURL = process.env.etc_ws_url
   config.etc.address = process.env.etc_validator_address
   config.etc.password = process.env.etc_validator_password
+
+  config.qtum.chainName = 'QTUM'
+  config.qtum.httpURL = process.env.qtum_http_url
+  config.qtum.wsURL = process.env.qtum_ws_url
+  config.qtum.address = process.env.qtum_validator_address
+  config.qtum.password = process.env.qtum_validator_password
   return config
 }
 
