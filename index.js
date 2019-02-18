@@ -25,6 +25,7 @@
 
 const program = require('commander')
 const process = require('process')
+const constant = require('./lib/const.js')
 const launcher = require('./lib/launcher')
 
 function init () {
@@ -50,18 +51,20 @@ function launchValidator (ethPassword, etcPassword) {
 }
 
 function createConfigObj () {
-  var config = { eth: {}, etc: {} }
-  config.eth.chainName = 'ETH'
-  config.eth.httpURL = process.env.eth_http_url
-  config.eth.wsURL = process.env.eth_ws_url
-  config.eth.address = process.env.eth_validator_address
-  config.eth.password = process.env.eth_validator_password
+  var config = {}
+  config.eth = preareConfig('eth')
+  config.etc = preareConfig('etc')
+  console.log(config)
+  return config
+}
 
-  config.etc.chainName = 'ETC'
-  config.etc.httpURL = process.env.etc_http_url
-  config.etc.wsURL = process.env.etc_ws_url
-  config.etc.address = process.env.etc_validator_address
-  config.etc.password = process.env.etc_validator_password
+function preareConfig (chain) {
+  var config = constant[chain]
+  config.chainName = chain.toUpperCase()
+  config.httpURL = process.env[chain + '_http_url']
+  config.wsURL = process.env[chain + '_ws_url']
+  config.address = process.env[chain + '_validator_address']
+  config.password = process.env[chain + '_validator_password']
   return config
 }
 

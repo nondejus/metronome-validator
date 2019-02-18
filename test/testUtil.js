@@ -27,6 +27,7 @@ const ethers = require('ethers')
 const MerkleTreeJs = require('merkletreejs')
 const crypto = require('crypto')
 const Chain = require('../lib/chain')
+const constant = require('../lib/const')
 require('dotenv').config()
 var config
 // create contract object from abi
@@ -35,8 +36,8 @@ function initContracts () {
     let ethChain, etcChain
     var config = createConfigObj()
     // create chain object to get contracts
-    ethChain = new Chain(config.eth, 'deveth', 0)
-    etcChain = new Chain(config.etc, 'devetc', 0)
+    ethChain = new Chain(config.eth)
+    etcChain = new Chain(config.etc)
     resolve({
       ETH: ethChain,
       ETC: etcChain
@@ -45,24 +46,20 @@ function initContracts () {
 }
 
 function createConfigObj () {
-  config = { eth: {}, etc: {}, qtum: {} }
-  config.eth.chainName = 'ETH'
-  config.eth.httpURL = process.env.eth_http_url
-  config.eth.wsURL = process.env.eth_ws_url
-  config.eth.address = process.env.eth_validator_address
-  config.eth.password = process.env.eth_validator_password
+  var config = {}
+  config.eth = preareConfig('eth')
+  config.etc = preareConfig('etc')
+  console.log('config', config)
+  return config
+}
 
-  config.etc.chainName = 'ETC'
-  config.etc.httpURL = process.env.etc_http_url
-  config.etc.wsURL = process.env.etc_ws_url
-  config.etc.address = process.env.etc_validator_address
-  config.etc.password = process.env.etc_validator_password
-
-  config.qtum.chainName = 'QTUM'
-  config.qtum.httpURL = process.env.qtum_http_url
-  config.qtum.wsURL = process.env.qtum_ws_url
-  config.qtum.address = process.env.qtum_validator_address
-  config.qtum.password = process.env.qtum_validator_password
+function preareConfig (chain) {
+  var config = constant[chain]
+  config.chainName = chain
+  config.httpURL = process.env[chain + '_http_url']
+  config.wsURL = process.env[chain + '_ws_url']
+  config.address = process.env[chain + '_validator_address']
+  config.password = process.env[chain + '_validator_password']
   return config
 }
 
