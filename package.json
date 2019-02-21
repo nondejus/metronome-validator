@@ -9,8 +9,8 @@
   },
   "scripts": {
     "docker:build": "docker build -t metronome-validator .",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "testValidator": "./node_modules/mocha/bin/mocha ./test/testExportImport.js --timeout 1000000 --exit"
+    "docker-compose:up": " docker-compose -f docker-compose.dev.yml up --force-recreate",
+    "test": "./node_modules/.bin/mocha ./test/testExportImport.js --timeout 100000 --exit"
   },
   "author": "",
   "license": "MIT",
@@ -37,6 +37,7 @@
     "lerna": "^3.8.5",
     "lodash": "^4.17.10",
     "merkletreejs": "0.0.9",
+    "metronome-contracts": "^2.0.0",
     "newrelic": "^4.9.0",
     "redis": "^2.8.0",
     "typedarray-to-buffer": "^3.1.5",

@@ -1,0 +1,72 @@
+version: '3.2'
+
+services:
+  parity-eth-dev:
+    image: parity/parity:v2.3.2
+    container_name: parity-eth-dev
+    volumes:
+      - ${parity_base_dir}:/home/parity/.local/share/io.parity.ethereum/
+      - ./devnet-eth.json:/home/parity/devnet.json
+    command:
+      - --base-path=/home/parity/.local/share/io.parity.ethereum/
+      - --bootnodes=enode://c84b1142224c2cd8c448ca2c6ff131285b334985af0c57e8d18652265c5a7c80447d6f3f9d393efe4e666b5bcbb1e2266066102453e1a489a23a64d7e2163016@35.237.184.229:33333
+      - --chain /home/parity/devnet.json
+      - --no-ipc
+      - --no-warp
+      - --force-sealing
+      - --jsonrpc-cors='*'
+      - --ws-apis=web3,eth,personal,rpc,net,parity,parity_accounts,pubsub
+      - --jsonrpc-apis=web3,eth,personal,rpc,net,parity,parity_accounts,pubsub
+      - --ws-hosts=all
+      - --ws-interface=all
+      - --jsonrpc-interface=all
+      - --jsonrpc-hosts=all
+      - --ws-origins=*
+    ports:
+      - 8545:8545
+      - 8546:8546
+    restart: on-failure
+  parity-etc-dev:
+    image: parity/parity:v2.3.2
+    container_name: parity-etc-dev
+    volumes:
+      - ${parity_base_dir}:/home/parity/.local/share/io.parity.ethereum/
+      - ./devnet-etc.json:/home/parity/devnet.json
+    command:
+      - --base-path=/home/parity/.local/share/io.parity.ethereum/
+      - --bootnodes=enode://e791c02a432914b8109bd99b4f77fd1b19afacc6068882d32737705a01403c6b2a46a8b9372dee990d0de34d3973dbca6f92dda214cb00a6187178eb7537808f@35.237.184.229:30301
+      - --chain /home/parity/devnet.json
+      - --no-ipc
+      - --no-warp
+      - --force-sealing
+      - --jsonrpc-cors='*'
+      - --ws-apis=web3,eth,personal,rpc,net,parity,parity_accounts,pubsub
+      - --jsonrpc-apis=web3,eth,personal,rpc,net,parity,parity_accounts,pubsub
+      - --ws-hosts=all
+      - --ws-interface=all
+      - --jsonrpc-interface=all
+      - --jsonrpc-hosts=all
+      - --ws-origins=*
+    ports:
+      - 8555:8545
+      - 8556:8546
+    restart: on-failure
+  redis:
+    container_name: redis
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - 6379:6379
+    volumes:
+      - ${REDIS_DATA}:/data
+    restart: always
+  validator:
+    image: metronome-validator:latest
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/metronome-validator
+    depends_on: 
+      - redis
+      - parity-etc-dev
+      - parity-eth-dev
