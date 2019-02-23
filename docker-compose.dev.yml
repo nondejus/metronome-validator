@@ -60,16 +60,27 @@ services:
     restart: always
   qtumd:
     container_name: qtumd
-    image: bloq/qtumd
+    image: qtum/qtum:0.17.1
     ports:
       - 9899:9899
       - 9888:9888
       - 3889:3889
+    command:
+      - qtumd
+      - -rpcbind=0.0.0.0:3889 
+      - -rpcallowip=0.0.0.0/0
+      - -datadir=/dapp/.qtum
+      - -logevents
+      - -rpcuser=${qtum_rpc_user} 
+      - -rpcpassword=${qtum_rpc_pass}
+      - -printtoconsole
+      - -regtest
     volumes:
-      - ~/Documents/work/temp/qtum/:/dapp
+      - ${qtum_data_dir}:/dapp
     restart: always
   validator:
     image: metronome-validator:latest
+    container_name: qtum-validator
     volumes:
       - /usr/src/metronome-validator/node_modules
       - .:/usr/src/metronome-validator
@@ -78,3 +89,4 @@ services:
       - parity-etc-dev
       - parity-eth-dev
       - qtumd
+    restart: always
