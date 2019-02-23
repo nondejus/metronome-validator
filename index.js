@@ -25,6 +25,7 @@
 
 const program = require('commander')
 const reader = require('./lib/file-reader')
+const constant = require('./lib/const')
 const launcher = require('./lib/launcher')
 
 function init () {
@@ -52,19 +53,19 @@ function launchValidator (ethPassword, etcPassword) {
 
 function createConfigObj () {
   var config = { eth: {}, etc: {}, qtum: {} }
-  config.eth.chainName = 'ETH'
+  config.eth.chainName = constant.ETH.alias
   config.eth.httpURL = process.env.eth_http_url
   config.eth.wsURL = process.env.eth_ws_url
   config.eth.address = process.env.eth_validator_address
   config.eth.password = process.env.eth_validator_password
 
-  config.etc.chainName = 'ETC'
+  config.etc.chainName = constant.ETC.alias
   config.etc.httpURL = process.env.etc_http_url
   config.etc.wsURL = process.env.etc_ws_url
   config.etc.address = process.env.etc_validator_address
   config.etc.password = process.env.etc_validator_password
 
-  config.qtum.chainName = 'QTUM'
+  config.qtum.chainName = constant.qtum.alias
   config.qtum.httpURL = process.env.qtum_http_url
   config.qtum.wsURL = process.env.qtum_ws_url
   config.qtum.address = process.env.qtum_validator_address

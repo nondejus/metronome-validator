@@ -43,7 +43,7 @@ function initContracts () {
     qChain = new QChain(config.qtum, metronomeContracts.qtum)
     resolve({
       ETH: ethChain,
-      QTUM: qChain,
+      qtum: qChain,
       ETC: etcChain
     })
   })
@@ -63,7 +63,7 @@ function createConfigObj () {
   config.etc.address = process.env.etc_validator_address
   config.etc.password = process.env.etc_validator_password
 
-  config.qtum.chainName = 'QTUM'
+  config.qtum.chainName = 'qtum'
   config.qtum.httpURL = process.env.qtum_http_url
   config.qtum.wsURL = process.env.qtum_ws_url
   config.qtum.address = process.env.qtum_validator_address
@@ -109,17 +109,16 @@ async function prepareImportData (chain, options) {
   let i = 0
   var logExportReceipt = await chain.getPastExportReceipts(options)
   const returnValues = logExportReceipt[0].returnValues
-
   if (returnValues.burnSequence > 15) {
     i = returnValues.burnSequence - 15
   }
   while (i <= returnValues.burnSequence) {
-    burnHashes.push(
-      await chain.contracts.tokenPorter.methods.exportedBurns(i).call()
-    )
+    var burnHash = await chain.call(chain.contracts.tokenPorter, 'exportedBurns', [i])
+    burnHash = burnHash.indexOf('0x') !== 0 ? '0x' + burnHash : burnHash
+    burnHashes.push(burnHash)
     i++
   }
-  let genesisTime = await chain.contracts.auctions.methods.genesisTime().call()
+  let genesisTime = await chain.call(chain.contracts.auctions, 'genesisTime')
   let dailyAuctionStartTime = await chain.call(chain.contracts.auctions, 'dailyAuctionStartTime', [])
   return {
     addresses: [
@@ -128,14 +127,14 @@ async function prepareImportData (chain, options) {
     ],
     burnHashes: [returnValues.prevBurnHash, returnValues.currentBurnHash],
     importData: [
-      ethers.utils.bigNumberify(returnValues.blockTimestamp),
-      ethers.utils.bigNumberify(returnValues.amountToBurn),
-      ethers.utils.bigNumberify(returnValues.fee),
-      ethers.utils.bigNumberify(returnValues.currentTick),
-      ethers.utils.bigNumberify(genesisTime),
-      ethers.utils.bigNumberify(returnValues.dailyMintable),
-      ethers.utils.bigNumberify(returnValues.burnSequence),
-      ethers.utils.bigNumberify(dailyAuctionStartTime)
+      ethers.utils.bigNumberify(returnValues.blockTimestamp.toString()),
+      ethers.utils.bigNumberify(returnValues.amountToBurn.toString()),
+      ethers.utils.bigNumberify(returnValues.fee.toString()),
+      ethers.utils.bigNumberify(returnValues.currentTick.toString()),
+      ethers.utils.bigNumberify(genesisTime.toString()),
+      ethers.utils.bigNumberify(returnValues.dailyMintable.toString()),
+      ethers.utils.bigNumberify(returnValues.burnSequence.toString()),
+      ethers.utils.bigNumberify(dailyAuctionStartTime.toString())
     ],
     root: getMerkleRoot(burnHashes),
     extraData: returnValues.extraData,

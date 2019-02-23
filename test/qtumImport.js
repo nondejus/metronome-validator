@@ -36,10 +36,10 @@ var ethChain, qChain, chains
 before(async () => {
   chains = await util.initContracts()
   ethChain = chains.ETH
-  qChain = chains.QTUM
+  qChain = chains.qtum
 })
 
-describe('Export test- ETH to QTUM', () => {
+describe('Chain hop test cases- ETH to QTUM', () => {
   var metBalance
   var receipt = ''
   var fee = ethers.utils.bigNumberify(2e14)
@@ -59,7 +59,7 @@ describe('Export test- ETH to QTUM', () => {
     ethChain.web3.eth.personal.unlockAccount(ethBuyer, ethPassword)
   })
 
-  it('Should be able to export from eth', () => {
+  it('Test case 1: Should be able to export from eth', () => {
     return new Promise(async (resolve, reject) => {
       let recepient = await qChain.qtum.rawCall('gethexaddress', [process.env.qtum_validator_address])
       recepient = '0x' + recepient
@@ -68,7 +68,6 @@ describe('Export test- ETH to QTUM', () => {
         .call()
       totalSupplybefore = ethers.utils.bigNumberify(totalSupplybefore)
       try {
-        console.log('exporting - test 1')
         receipt = await ethChain.contracts.metToken.methods.export(
           ethChain.web3.utils.toHex('qtum'),
           qChain.contracts.metToken.info.address,
@@ -93,13 +92,13 @@ describe('Export test- ETH to QTUM', () => {
     })
   })
 
-  it('Should be able to submit import request in qtum', () => {
+  it('Test case 2: Should be able to submit import request in qtum', () => {
     return new Promise(async (resolve, reject) => {
-      var filter = {}
-      // var burnHash = '0xa51675480858c4f492752ba63ba3a102da1400baca2c54ae3e6378767b74050f'
-      // filter = { currentBurnHash: burnHash }
-      // var options = { filter, fromBlock: '0', toBlock: 'latest' }
-      var options = { filter, fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber }
+      // var burnHash = '0x6b906747a7bf888e5ff8e89f9a08e4aee450d57df46300e370a0e13ef48c2840'
+      var burnSequence = await ethChain.contracts.tokenPorter.methods.burnSequence().call()
+      var burnHash = await ethChain.contracts.tokenPorter.methods.exportedBurns(burnSequence - 1).call()
+      var filter = { currentBurnHash: burnHash }
+      var options = { filter, fromBlock: 0, toBlock: 'latest' }
       let importDataObj = await util.prepareImportData(ethChain, options)
       try {
         await qChain.send(qChain.contracts.metToken, 'importMET', [
@@ -122,11 +121,14 @@ describe('Export test- ETH to QTUM', () => {
     })
   })
 
-  it('Should be able to validate and attest export receipt in qtum', () => {
+  it('Test case 3: Validators should be able to validate and attest export receipt in qtum', () => {
     return new Promise(async (resolve, reject) => {
       var validator = new Validator(chains, qChain)
-      var filter = {}
-      var options = { filter, fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber }
+      // var burnHash = '0x6b906747a7bf888e5ff8e89f9a08e4aee450d57df46300e370a0e13ef48c2840'
+      var burnSequence = await ethChain.contracts.tokenPorter.methods.burnSequence().call()
+      var burnHash = await ethChain.contracts.tokenPorter.methods.exportedBurns(burnSequence - 1).call()
+      var filter = { currentBurnHash: burnHash }
+      var options = { filter, fromBlock: 0, toBlock: 'latest' }
       var logExportReceipt = await ethChain.getPastExportReceipts(options)
       const returnValues = logExportReceipt[0].returnValues
       let originChain = 'ETH'
@@ -144,7 +146,7 @@ describe('Export test- ETH to QTUM', () => {
         let balanceAfter = await qChain.call(qChain.contracts.metToken, 'balanceOf', [returnValues.destinationRecipientAddr])
         balanceAfter = ethers.utils.bigNumberify(balanceAfter.toString())
         balanceBefore = ethers.utils.bigNumberify(balanceBefore.toString())
-        assert(balanceAfter.eq(balanceBefore.add(amount)))
+        assert(balanceAfter.eq(balanceBefore.add(amount.add(fee))))
       }
       resolve()
     })
