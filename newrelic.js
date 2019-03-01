@@ -10,11 +10,11 @@ exports.config = {
   /**
    * Array of application names.
    */
-  app_name: ['metronome-validator'],
+  app_name: config.newrelic.appName,
   /**
    * Your New Relic license key.
    */
-  license_key: config.newRelic.licenseKey,
+  license_key: config.newrelic.licenseKey,
   logging: {
     /**
      * Level at which to log. 'trace' is most useful to New Relic when diagnosing

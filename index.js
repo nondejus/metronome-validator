@@ -27,13 +27,11 @@ const program = require('commander')
 const process = require('process')
 const constant = require('./lib/const.js')
 const launcher = require('./lib/launcher')
-
+var config = require('config')
 function init () {
   program
-    .option('-d, --dev', 'Run app in dev environment (without passwords)')
     .command('launch')
     .description('Launch off-chain metronome validator')
-    .arguments('[eth-password] [etc-password]')
     .action(launchValidator)
 
   program.parse(process.argv)
@@ -51,21 +49,19 @@ function launchValidator (ethPassword, etcPassword) {
 }
 
 function createConfigObj () {
-  var config = {}
-  config.eth = preareConfig('eth')
-  config.etc = preareConfig('etc')
+  preareConfig('eth')
+  preareConfig('etc')
   console.log(config)
   return config
 }
 
 function preareConfig (chain) {
-  var config = constant[chain]
-  config.chainName = chain.toUpperCase()
-  config.httpURL = process.env[chain + '_http_url']
-  config.wsURL = process.env[chain + '_ws_url']
-  config.address = process.env[chain + '_validator_address']
-  config.password = process.env[chain + '_validator_password']
-  return config
+  config[chain] = { ...config[chain], ...constant[chain] }
+  config[chain].chainName = chain.toUpperCase()
+  config[chain].httpURL = process.env[chain + '_http_url']
+  config[chain].wsURL = process.env[chain + '_ws_url']
+  config[chain].address = process.env[chain + '_validator_address']
+  config[chain].password = process.env[chain + '_validator_password']
 }
 
 init()
