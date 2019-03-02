@@ -3,42 +3,50 @@
 Metronome off chain validators to validate export receipt and attest the same in destination chain.
 
 ### Prerequisites
-1. Parity
-2. Redis-server
-3. Full synced etherum and ethereum classic node. Setting up both nodes on one computer will need to setup different port number for both.  Examples below
-      Ethereum:    $ parity --geth --rpcapi=web3,eth,personal,rpc,net,parity  --jsonrpc-port=8545 --ws-port=8546 --port=33333 
-      Ethereum classic: $ parity --geth --rpcapi=web3,eth,personal,rpc,net,parity  --jsonrpc-port=8555 --ws-port=8556 --port=30303 
+1. Full Synced Parity or Geth node. 
+2. Docker 
+3. Validator's address must be added as whitelist validators in smart contract. 
+4. Must have ether to pay for gas cost of attestation
 
-### Installing
-Install all depedencies packages by using below command in this directory
-npm install
+### Setup & Installing 
+<b>Testnet and Mainet:</b>
+1. Create metronome validators. using command docker build -t metronome-validator .
+2. set appropriate network name in ./config/default.json
+3. Set env variables
 
-### Setup
-1. Ethereum and Ethereum classic node must have two eth address setup on both nodes. Both address should have eth balance to pay for gas cost of attestation. 
-2. Update config.json . Below is an example. Update node URL and address. Keep chainName same as example.  Most likely Ethereum and Ethereum classic may run on same computer but different port
-{                                                             
-    "eth": {
-        "chainName":"ETH",                                   
-       "nodeUrl": "http://localhost:8545",  // URL of ethereum node. Node must be full synced all time  
-        "address": "0x00a329c0648769a73afac7f9381e08fb43dbea72" // Address of validator. Must have ether in balance to pay for gas cost            
-    },                                         
-    "etc": {         
-        "chainName":"ETC",                               
-       "nodeUrl": "http://localhost:8555",  // URL of ethereum classic node. Node must be full synced all time   
-        "address": "0x00a329c0648769a73afac7f9381e08fb43dbea72" // Address of validator. Must have ether in balance to pay for gas cost            
-    }                                          
-} 
+      eth_http_url=\<ETH node http url:port>
 
-## Launch
-  1. start redis server using command $ redis-server
-  2. Launch validators using command $ node index.js launch [eth validator password] [etc validator password]   
-       example:
-       $ node index.js launch 'mypassword1' 'mypassword2'
+      eth_ws_url=\<ETH node ws url:port>
+      
+      etc_http_url=\<ETC node http url:port>
+      
+      etc_ws_url=\<ETC node ws url:port>
 
-For dev environment or no password require for validators then use command $ node index.js launch --dev
+      eth_validator_address=\<address>
+      
+      etc_validator_address=\<address>
+      
+      One of below to sign transaction.
 
-## Production environment
-  For security reason, redis server port and URL must not be accessible from outside hence firewall must setup to disable http and specific port. 
+      a) walletMnemonic=\<mnemonic phrase>
+     
+      One mnomic phrase can be used for both eth, etc. For more information refer link https://iancoleman.io/bip39 . generate phrase and use correct address in etc_validator_address, eth_validator_address
+    
+      or
+      
+      b) etc_validator_password=\<password>
+   
+      eth_validator_password=\<password>
+   
+4. docker-compose up
+
+<b>Private network:</b>
+1. Git clone https://github.com/autonomoussoftware/metronome-contracts-js .
+2. Deploy new contracts in private network.
+3. Define network name, update abi, address in metronome-contracts-js.
+4. set network name in ./config/default.json. Must be same as defined in #3.
+3. Update package.json of metronome validators to use local metronome-contract-js package
+4. docker-compose -f docker-compose.dev.yml up 
 
 ### License 
 MIT
