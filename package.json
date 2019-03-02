@@ -8,6 +8,7 @@
     "metronome-validator": "index.js"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "docker:build": "docker build -t metronome-validator .",
     "docker-compose:up": " docker-compose -f docker-compose.dev.yml up --force-recreate",
     "test": "./node_modules/.bin/mocha ./test/testExportImport.js --timeout 100000 --exit"
@@ -23,7 +24,8 @@
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
     "mocha": "5.1.0",
-    "bn.js": "^4.11.8"
+    "bn.js": "^4.11.8",
+    "patch-package": "^5.1.1"
   },
   "dependencies": {
     "bluebird": "^3.5.2",
@@ -40,8 +42,10 @@
     "metronome-contracts": "^2.0.0",
     "newrelic": "^4.9.0",
     "redis": "^2.8.0",
+    "truffle-hdwallet-provider": "^1.0.4",
     "typedarray-to-buffer": "^3.1.5",
-    "web3": "https://github.com/bloq/web3.js/tarball/reconnect-resubscribe",
+    "web3": "1.0.0-beta.37",
+    "websocket-reconnector": "^1.1.1",
     "winston": "^3.1.0",
     "winston-papertrail": "^1.0.5",
     "yaeti": "^1.0.2"

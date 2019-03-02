@@ -17,6 +17,7 @@ services:
       - eth_validator_password=${eth_validator_password}
       - eth_ws_url=${eth_ws_url}
       - REDIS_URL=${REDIS_URL}
+      - walletMnemonic=${walletMnemonic}
     depends_on: 
       - redis
     restart: always

@@ -16,5 +16,5 @@ RUN npm install
 RUN npm install
 COPY . .
 RUN rm .env
-
+RUN npm run postinstall
 CMD ["node", "index.js", "launch"]
