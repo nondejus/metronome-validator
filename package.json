@@ -10,6 +10,7 @@
   "scripts": {
     "docker:build": "docker build -t metronome-validator .",
     "test": "npm run testQtumImport && npm run testQtumExport && exit 1",
+    "testAC": "./node_modules/.bin/mocha ./test/ac.js --timeout 1000000 && exit",
     "testAuction": "./node_modules/.bin/mocha ./test/auctions.js --timeout 1000000 && exit",
     "testValidator": "./node_modules/.bin/mocha ./test/testExportImport.js --timeout 1000000 && exit",
     "testQtumImport": "./node_modules/.bin/mocha ./test/qtumImport.js --timeout 1000000 --exit",
