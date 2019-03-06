@@ -1,26 +1,19 @@
 const assert = require('chai').assert
-const ethers = require('ethers')
 const util = require('./testUtil')
-const Validator = require('../lib/validator')
 require('dotenv').config()
 
-var ethBuyer = process.env.eth_validator_address
-var ethPassword = process.env.eth_validator_password
-
-var ethChain, qChain, chains
+var qChain, chains
 
 before(async () => {
   chains = await util.initContracts()
-  ethChain = chains.ETH
   qChain = chains.qtum
 })
 
-describe('Chain hop test cases- ETH to QTUM', () => {
+describe('Auction test in qtum', () => {
   before(async () => {
   })
 
   beforeEach(async () => {
-    ethChain.web3.eth.personal.unlockAccount(ethBuyer, ethPassword)
   })
 
   it('Should be able to buy from Auction', () => {
