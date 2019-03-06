@@ -71,7 +71,7 @@ describe('Chain hop test cases. QTUM to ETH', () => {
           recepient,
           amount,
           fee,
-          ethChain.web3.utils.toHex(extraData)], { from: exporter })
+          ethChain.web3.utils.toHex(extraData)], { from: exporter, gas: 10000000 })
       } catch (error) {
         console.log('error', error)
         return reject(error)
