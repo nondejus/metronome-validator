@@ -30,13 +30,18 @@ require('dotenv').config()
 
 var ethBuyer = process.env.eth_validator_address
 var ethPassword = process.env.eth_validator_password
-
 var ethChain, qChain, chains
 
 before(async () => {
   chains = await util.initContracts()
   ethChain = chains.ETH
   qChain = chains.qtum
+  console.log('adding dest chain and validators')
+  await ethChain.contracts.tokenPorter.methods.addDestinationChain(ethChain.web3.utils.toHex('qtum'), qChain.contracts.metToken.info.address)
+    .send({ from: ethBuyer })
+  let hexAddress = await qChain.qtum.rawCall('gethexaddress', [process.env.qtum_validator_address])
+  let owner = await qChain.call(qChain.contracts.validator, 'owner', [])
+  await qChain.send(qChain.contracts.validator, 'addValidator', [hexAddress], { senderAddress: owner })
 })
 
 describe('Chain hop test cases- ETH to QTUM', () => {
@@ -96,10 +101,12 @@ describe('Chain hop test cases- ETH to QTUM', () => {
     return new Promise(async (resolve, reject) => {
       // var burnHash = '0x6b906747a7bf888e5ff8e89f9a08e4aee450d57df46300e370a0e13ef48c2840'
       var burnSequence = await ethChain.contracts.tokenPorter.methods.burnSequence().call()
+      console.log('burnSequence', burnSequence)
       var burnHash = await ethChain.contracts.tokenPorter.methods.exportedBurns(burnSequence - 1).call()
       var filter = { currentBurnHash: burnHash }
       var options = { filter, fromBlock: 0, toBlock: 'latest' }
       let importDataObj = await util.prepareImportData(ethChain, options)
+      console.log('importDataObj', importDataObj)
       try {
         await qChain.send(qChain.contracts.metToken, 'importMET', [
           ethChain.web3.utils.toHex('ETH'),
@@ -109,7 +116,8 @@ describe('Chain hop test cases- ETH to QTUM', () => {
           importDataObj.burnHashes,
           importDataObj.supplyOnAllChains,
           importDataObj.importData,
-          importDataObj.root]
+          importDataObj.root],
+        { gas: 10000000 }
         )
         let root = await qChain.call(qChain.contracts.tokenPorter, 'merkleRoots', [importDataObj.burnHashes[1]])
         root = '0x' + root
