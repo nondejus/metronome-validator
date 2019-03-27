@@ -23,8 +23,8 @@ services:
       - --jsonrpc-hosts=all
       - --ws-origins=*
     ports:
-      - 8545:8545
-      - 8546:8546
+      - 9545:8545
+      - 9546:8546
     restart: on-failure
   parity-etc-dev:
     image: parity/parity:v2.3.2
@@ -48,8 +48,8 @@ services:
       - --jsonrpc-hosts=all
       - --ws-origins=*
     ports:
-      - 8555:8545
-      - 8556:8546
+      - 9555:8545
+      - 9556:8546
     restart: on-failure
   redis:
     container_name: redis
@@ -74,12 +74,12 @@ services:
       - -rpcuser=${qtum_rpc_user} 
       - -rpcpassword=${qtum_rpc_pass}
       - -printtoconsole
-      - -regtest
+      - -${qtum_network}
     volumes:
       - ${qtum_data_dir}:/dapp
     restart: always
   validator:
-    image: metronome-validator:latest
+    image: qtum-validator:latest
     container_name: qtum-validator
     volumes:
       - /usr/src/metronome-validator/node_modules

@@ -37,6 +37,7 @@ before(async () => {
   ethChain = chains.ETH
   qChain = chains.qtum
   console.log('adding dest chain and validators')
+  ethChain.web3.eth.personal.unlockAccount(ethBuyer, ethPassword)
   await ethChain.contracts.tokenPorter.methods.addDestinationChain(ethChain.web3.utils.toHex('qtum'), qChain.contracts.metToken.info.address)
     .send({ from: ethBuyer })
   let hexAddress = await qChain.qtum.rawCall('gethexaddress', [process.env.qtum_validator_address])
@@ -99,7 +100,7 @@ describe('Chain hop test cases- ETH to QTUM', () => {
 
   it('Test case 2: Should be able to submit import request in qtum', () => {
     return new Promise(async (resolve, reject) => {
-      // var burnHash = '0x6b906747a7bf888e5ff8e89f9a08e4aee450d57df46300e370a0e13ef48c2840'
+      // var burnHash = '0xffc1e6814d4c59b28b11441475cc4a3d276c89f57b16b5c6103a01fc727a19e2'
       var burnSequence = await ethChain.contracts.tokenPorter.methods.burnSequence().call()
       console.log('burnSequence', burnSequence)
       var burnHash = await ethChain.contracts.tokenPorter.methods.exportedBurns(burnSequence - 1).call()
@@ -117,7 +118,7 @@ describe('Chain hop test cases- ETH to QTUM', () => {
           importDataObj.supplyOnAllChains,
           importDataObj.importData,
           importDataObj.root],
-        { gas: 10000000 }
+        { gas: 10000000, from: process.env.qtum_validator_address }
         )
         let root = await qChain.call(qChain.contracts.tokenPorter, 'merkleRoots', [importDataObj.burnHashes[1]])
         root = '0x' + root

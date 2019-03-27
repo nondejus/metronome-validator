@@ -1,0 +1,12 @@
+#!/bin/sh
+
+#qtum-cli -rpcport=3889 -rpcuser=$QTUM_RPC_USER -rpcpassword=$QTUM_RPC_PASS -regtest "$@"
+method=$1 
+shift
+args=( "$@" )
+echo "$@"
+#echo "method "$1""
+#curl --user qtum:test --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "'"$1"'", "params": ["'"$2"'"] }' -H 'content-type: text/plain;' http://localhost:3889/
+curl --user qtum:test --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "'"$method"'", "params": [qQ7p5CcngS7uFJ5h1HB92sGnNx6MLW1WrB 100] }' -H 'content-type: text/plain;' http://localhost:3889/
+#curl --user qtum:test --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "'"$method"'", "params": "'"$args"'" }' -H 'content-type: text/plain;' http://localhost:3889/
+#curl --user qtum:test --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "gethexaddress", "params": ["qQ7p5CcngS7uFJ5h1HB92sGnNx6MLW1WrB"] }' -H 'content-type: text/plain;' http://localhost:3889/
