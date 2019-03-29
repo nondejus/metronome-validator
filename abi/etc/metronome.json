@@ -178,7 +178,7 @@
     "type": "event"
    }
   ],
-  "address": "0xfe7dc97c4695c3442f8a5af590f9e031e183bf00"
+  "address": "0xf2838940d5cd0e956902a08058fbb75216a23f2d"
  },
  "Auctions": {
   "abi": [
@@ -1032,25 +1032,6 @@
    },
    {
     "constant": true,
-    "inputs": [
-     {
-      "name": "",
-      "type": "address"
-     }
-    ],
-    "name": "tokenLockers",
-    "outputs": [
-     {
-      "name": "",
-      "type": "address"
-     }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-   },
-   {
-    "constant": true,
     "inputs": [],
     "name": "token",
     "outputs": [
@@ -1143,7 +1124,7 @@
     "type": "event"
    }
   ],
-  "address": "0x02ff7df6c76dd395faf86668cce5936a1a769b75"
+  "address": "0x5dbb782d0f195ef073b51863f42e0c5fa49b7aa6"
  },
  "AutonomousConverter": {
   "abi": [
@@ -1468,7 +1449,7 @@
     "type": "event"
    }
   ],
-  "address": "0xe2bd1d3d52e3190bff19883dfd2b12e31027e42f"
+  "address": "0x738e50ed2a6095aadee5c7fb9e6eeff103de80d8"
  },
  "SmartToken": {
   "abi": [
@@ -1613,6 +1594,20 @@
    },
    {
     "constant": true,
+    "inputs": [],
+    "name": "leakage",
+    "outputs": [
+     {
+      "name": "",
+      "type": "uint256"
+     }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+   },
+   {
+    "constant": true,
     "inputs": [
      {
       "name": "_owner",
@@ -1677,6 +1672,29 @@
       "type": "bool"
      }
     ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+   },
+   {
+    "constant": false,
+    "inputs": [
+     {
+      "name": "_value",
+      "type": "uint256"
+     }
+    ],
+    "name": "updateLeakage",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+   },
+   {
+    "constant": false,
+    "inputs": [],
+    "name": "resetLeakage",
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1795,7 +1813,7 @@
     "type": "event"
    }
   ],
-  "address": "0x20eb92705c2ed27c6db83e76a81ad0b9e38e6de0"
+  "address": "0xbc85a85b94f3ffbc6d368ed82010db09a9670e75"
  },
  "METToken": {
   "abi": [
@@ -2187,6 +2205,20 @@
     "type": "function"
    },
    {
+    "constant": true,
+    "inputs": [],
+    "name": "leakage",
+    "outputs": [
+     {
+      "name": "",
+      "type": "uint256"
+     }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+   },
+   {
     "constant": false,
     "inputs": [
      {
@@ -2462,6 +2494,29 @@
       "type": "bool"
      }
     ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+   },
+   {
+    "constant": false,
+    "inputs": [
+     {
+      "name": "_value",
+      "type": "uint256"
+     }
+    ],
+    "name": "updateLeakage",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+   },
+   {
+    "constant": false,
+    "inputs": [],
+    "name": "resetLeakage",
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -2769,7 +2824,7 @@
     "type": "event"
    }
   ],
-  "address": "0x5da10980a4fc376d5296b2a2f2fb36d8a520c31b"
+  "address": "0x9b4652ac822f389cbec56d2fd17c79dad569c997"
  },
  "TokenPorter": {
   "abi": [
@@ -3178,6 +3233,25 @@
     "type": "function"
    },
    {
+    "constant": true,
+    "inputs": [
+     {
+      "name": "",
+      "type": "bytes32"
+     }
+    ],
+    "name": "burnAtTick",
+    "outputs": [
+     {
+      "name": "",
+      "type": "uint256"
+     }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+   },
+   {
     "constant": false,
     "inputs": [
      {
@@ -3553,7 +3627,7 @@
     "type": "event"
    }
   ],
-  "address": "0x19fd547127993c3984cd3bacaa475326b49e3543"
+  "address": "0xcf1258e09004fdea164abb43b0bd0ac62df25ccd"
  },
  "Validator": {
   "abi": [
@@ -3998,6 +4072,6 @@
     "type": "event"
    }
   ],
-  "address": "0x70656c9bc20b3e603e6638b36c92b117f4120974"
+  "address": "0x54b420652a3ac91b0f3e19a18374a8ac612fab3c"
  }
 }

@@ -178,7 +178,7 @@
     "type": "event"
    }
   ],
-  "address": "0xa5544906cd3ae55eeb89a0a552405370066d1554"
+  "address": "0x888cc95e6047a11f15cf2275b91adeb9fd995404"
  },
  "Auctions": {
   "abi": [
@@ -1008,53 +1008,6 @@
     "type": "function"
    },
    {
-    "constant": false,
-    "inputs": [
-     {
-      "name": "_token",
-      "type": "address"
-     },
-     {
-      "name": "_proceeds",
-      "type": "address"
-     },
-     {
-      "name": "_genesisTime",
-      "type": "uint256"
-     },
-     {
-      "name": "_minimumPrice",
-      "type": "uint256"
-     },
-     {
-      "name": "_startingPrice",
-      "type": "uint256"
-     },
-     {
-      "name": "_timeScale",
-      "type": "uint256"
-     },
-     {
-      "name": "_chain",
-      "type": "bytes8"
-     },
-     {
-      "name": "_initialAuctionEndTime",
-      "type": "uint256"
-     }
-    ],
-    "name": "skipInitBecauseIAmNotOg",
-    "outputs": [
-     {
-      "name": "",
-      "type": "bool"
-     }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-   },
-   {
     "constant": true,
     "inputs": [],
     "name": "totalMigratedOut",
@@ -1209,7 +1162,7 @@
     "type": "event"
    }
   ],
-  "address": "0x0377f6c3f2fcf247f88f613e68b1af90c780d91d"
+  "address": "0x68f27fa390804a1184af68e7d4d58dd1ce53eb00"
  },
  "AutonomousConverter": {
   "abi": [
@@ -1534,7 +1487,7 @@
     "type": "event"
    }
   ],
-  "address": "0x5f1be3ab8fa86fdd970dd6be35155691933765c3"
+  "address": "0xeb794e3437011e96bdfaf27aee83bbba899564c1"
  },
  "SmartToken": {
   "abi": [
@@ -1861,7 +1814,7 @@
     "type": "event"
    }
   ],
-  "address": "0x21791e1b840fca86f62ad00a79ddf0f38c2e6043"
+  "address": "0x8b38d73ea95f7e84c698af4ed29ae7d82c4121c3"
  },
  "METToken": {
   "abi": [
@@ -2835,7 +2788,7 @@
     "type": "event"
    }
   ],
-  "address": "0x412bead4f75ecd285e09da74552d5dac5098d17f"
+  "address": "0x9efaf5a19d0261dbfbba97cfcc0985fcdf8ce0df"
  },
  "TokenPorter": {
   "abi": [
@@ -3617,9 +3570,153 @@
     ],
     "name": "ExportOnChainClaimedReceiptLog",
     "type": "event"
+   },
+   {
+    "anonymous": false,
+    "inputs": [
+     {
+      "indexed": false,
+      "name": "destinationChain",
+      "type": "bytes8"
+     },
+     {
+      "indexed": false,
+      "name": "destinationMetronomeAddr",
+      "type": "address"
+     },
+     {
+      "indexed": true,
+      "name": "destinationRecipientAddr",
+      "type": "address"
+     },
+     {
+      "indexed": false,
+      "name": "amountToBurn",
+      "type": "uint256"
+     },
+     {
+      "indexed": false,
+      "name": "fee",
+      "type": "uint256"
+     },
+     {
+      "indexed": false,
+      "name": "extraData",
+      "type": "bytes"
+     },
+     {
+      "indexed": false,
+      "name": "currentTick",
+      "type": "uint256"
+     },
+     {
+      "indexed": true,
+      "name": "burnSequence",
+      "type": "uint256"
+     },
+     {
+      "indexed": true,
+      "name": "currentBurnHash",
+      "type": "bytes32"
+     },
+     {
+      "indexed": false,
+      "name": "prevBurnHash",
+      "type": "bytes32"
+     },
+     {
+      "indexed": false,
+      "name": "dailyMintable",
+      "type": "uint256"
+     },
+     {
+      "indexed": false,
+      "name": "supplyOnAllChains",
+      "type": "uint256[]"
+     },
+     {
+      "indexed": false,
+      "name": "genesisTime",
+      "type": "uint256"
+     },
+     {
+      "indexed": false,
+      "name": "blockTimestamp",
+      "type": "uint256"
+     },
+     {
+      "indexed": false,
+      "name": "dailyAuctionStartTime",
+      "type": "uint256"
+     }
+    ],
+    "name": "ExportReceiptLog",
+    "type": "event"
+   },
+   {
+    "anonymous": false,
+    "inputs": [
+     {
+      "indexed": true,
+      "name": "destinationRecipientAddr",
+      "type": "address"
+     },
+     {
+      "indexed": false,
+      "name": "amountImported",
+      "type": "uint256"
+     },
+     {
+      "indexed": false,
+      "name": "fee",
+      "type": "uint256"
+     },
+     {
+      "indexed": false,
+      "name": "extraData",
+      "type": "bytes"
+     },
+     {
+      "indexed": false,
+      "name": "currentTick",
+      "type": "uint256"
+     },
+     {
+      "indexed": true,
+      "name": "importSequence",
+      "type": "uint256"
+     },
+     {
+      "indexed": true,
+      "name": "currentHash",
+      "type": "bytes32"
+     },
+     {
+      "indexed": false,
+      "name": "prevHash",
+      "type": "bytes32"
+     },
+     {
+      "indexed": false,
+      "name": "dailyMintable",
+      "type": "uint256"
+     },
+     {
+      "indexed": false,
+      "name": "blockTimestamp",
+      "type": "uint256"
+     },
+     {
+      "indexed": false,
+      "name": "caller",
+      "type": "address"
+     }
+    ],
+    "name": "ImportReceiptLog",
+    "type": "event"
    }
   ],
-  "address": "0xc5e4f80954a6182d64ebadfd94178fed5a5dc24c"
+  "address": "0xd08365057e90f4aa80d1105aa0cdc154dc311a66"
  },
  "Validator": {
   "abi": [
@@ -4064,6 +4161,6 @@
     "type": "event"
    }
   ],
-  "address": "0x72b0cd397ee07466f7d04b63c0f2bbbae0e037da"
+  "address": "0x9c2c25ae97ea21e9ed7132fc7b793a5ca74450ba"
  }
 }
