@@ -29,8 +29,9 @@ const crypto = require('crypto')
 const reader = require('../lib/file-reader')
 const Chain = require('../lib/chain')
 const QChain = require('../lib/qChain')
+var config = require('config')
+const constant = require('../lib/const')
 require('dotenv').config()
-var config
 // create contract object from abi
 function initContracts () {
   return new Promise(async (resolve, reject) => {
@@ -42,33 +43,29 @@ function initContracts () {
     etcChain = new Chain(config.etc, metronomeContracts.etc)
     qChain = new QChain(config.qtum, metronomeContracts.qtum)
     resolve({
-      ETH: ethChain,
+      eth: ethChain,
       qtum: qChain,
-      ETC: etcChain
+      etc: etcChain
     })
   })
 }
 
 function createConfigObj () {
-  config = { eth: {}, etc: {}, qtum: {} }
-  config.eth.chainName = 'ETH'
-  config.eth.httpURL = process.env.eth_http_url
-  config.eth.wsURL = process.env.eth_ws_url
-  config.eth.address = process.env.eth_validator_address
-  config.eth.password = process.env.eth_validator_password
-
-  config.etc.chainName = 'ETC'
-  config.etc.httpURL = process.env.etc_http_url
-  config.etc.wsURL = process.env.etc_ws_url
-  config.etc.address = process.env.etc_validator_address
-  config.etc.password = process.env.etc_validator_password
-
-  config.qtum.chainName = 'qtum'
-  config.qtum.httpURL = process.env.qtum_http_url
-  config.qtum.wsURL = process.env.qtum_ws_url
-  config.qtum.address = process.env.qtum_validator_address
-  config.qtum.password = process.env.qtum_validator_password
+  preareConfig('eth')
+  preareConfig('etc')
+  preareConfig('qtum')
   return config
+}
+
+function preareConfig (chain) {
+  config[chain] = { ...config[chain], ...constant[chain] }
+  console.log('config[chain]', config[chain])
+  config[chain].chainName = chain
+  config[chain].httpURL = process.env[chain + '_http_url']
+  config[chain].wsURL = process.env[chain + '_ws_url']
+  config[chain].address = process.env[chain + '_validator_address']
+  config[chain].password = process.env[chain + '_validator_password']
+  config[chain].walletMnemonic = process.env.walletMnemonic
 }
 
 // Create account and send some ether in it
@@ -113,13 +110,13 @@ async function prepareImportData (chain, options) {
     i = returnValues.burnSequence - 15
   }
   while (i <= returnValues.burnSequence) {
-    var burnHash = await chain.call(chain.contracts.tokenPorter, 'exportedBurns', [i])
+    var burnHash = await chain.call(chain.contracts.TokenPorter, 'exportedBurns', [i])
     burnHash = burnHash.indexOf('0x') !== 0 ? '0x' + burnHash : burnHash
     burnHashes.push(burnHash)
     i++
   }
-  let genesisTime = await chain.call(chain.contracts.auctions, 'genesisTime')
-  let dailyAuctionStartTime = await chain.call(chain.contracts.auctions, 'dailyAuctionStartTime', [])
+  let genesisTime = await chain.call(chain.contracts.Auctions, 'genesisTime')
+  let dailyAuctionStartTime = await chain.call(chain.contracts.Auctions, 'dailyAuctionStartTime', [])
   return {
     addresses: [
       returnValues.destinationMetronomeAddr,
@@ -154,27 +151,25 @@ async function mineBlocks (chain, count, recepient) {
 }
 
 async function getMET (chain, recepient) {
-  let metBalance = await chain.contracts.metToken.methods
-    .balanceOf(recepient)
-    .call()
+  let metBalance = await chain.contracts.METToken.methods.balanceOf(recepient).call()
   metBalance = ethers.utils.bigNumberify(metBalance)
   if (metBalance.gt(ethers.utils.bigNumberify('1000000000000000'))) {
     return
   }
   var web3 = chain.web3
-  let mintable = await chain.contracts.auctions.methods
+  let mintable = await chain.contracts.Auctions.methods
     .mintable()
     .call()
   mintable = ethers.utils.bigNumberify(mintable)
   if (mintable.gt(ethers.utils.bigNumberify('10000000000000000000'))) {
     await web3.eth.sendTransaction({
-      to: chain.contracts.auctions.options.address,
+      to: chain.contracts.Auctions.options.address,
       from: recepient,
       value: 2e14
     })
     return
   }
-  await chain.contracts.autonomousConverter.methods
+  await chain.contracts.AutonomousConverter.methods
     .convertEthToMet(1)
     .send({ from: recepient, value: 1e16 })
 }

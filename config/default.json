@@ -1,0 +1,24 @@
+{
+  "eth": {
+    "confirmationCount": 0,
+    "network": "deveth"
+  },
+  "etc": {
+    "confirmationCount": 0,
+    "network": "devetc"
+  },
+  "qtum": {
+    "confirmationCount": 0,
+    "network": "testnet"
+  },
+  "newrelic": {
+    "appName": "metronome-validator-testnet",
+    "licenseKey": "4dced28d5c5335262086ab0851c7f0ae6cf60d50"
+  },
+  "gasPrice": 30000000000,
+  "parpertrail": {
+    "host": "logs6.papertrailapp.com",
+    "port": 28696
+  },
+  "synctolerance": 18000 
+}

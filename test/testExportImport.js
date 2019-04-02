@@ -38,7 +38,7 @@ async function validateMinting (
   expectedTotalSupply,
   expectedBalanceOfRecepient
 ) {
-  let currentTotalSupply = await chain.contracts.metToken.methods
+  let currentTotalSupply = await chain.contracts.METToken.methods
     .totalSupply()
     .call()
   currentTotalSupply = ethers.utils.bigNumberify(
@@ -46,7 +46,7 @@ async function validateMinting (
   )
   var diff = expectedTotalSupply.sub(currentTotalSupply)
   assert.closeTo(diff.toNumber(), 0, 3, 'Total supply is wrong after import')
-  let balanceOfRecepient = await chain.contracts.metToken.methods
+  let balanceOfRecepient = await chain.contracts.METToken.methods
     .balanceOf(recipient)
     .call()
   assert.equal(
@@ -80,7 +80,7 @@ describe('cross chain testing', () => {
       let feePerTenThousand = 1
       // Buy some MET
       await util.getMET(eth, ethBuyer1)
-      let metBalance = await eth.contracts.metToken.methods
+      let metBalance = await eth.contracts.METToken.methods
         .balanceOf(ethBuyer1)
         .call()
       assert(metBalance > 0, 'Exporter has no MET token balance')
@@ -97,7 +97,7 @@ describe('cross chain testing', () => {
         'Fee should be greater than defined fee'
       )
       let extraData = 'D'
-      let totalSupplybefore = await eth.contracts.metToken.methods
+      let totalSupplybefore = await eth.contracts.METToken.methods
         .totalSupply()
         .call()
       totalSupplybefore = ethers.utils.bigNumberify(totalSupplybefore)
@@ -105,10 +105,10 @@ describe('cross chain testing', () => {
         var receipt = ''
         console.log('exporting - test 1')
         // amount = 9114360669749024
-        receipt = await eth.contracts.metToken.methods
+        receipt = await eth.contracts.METToken.methods
           .export(
             eth.web3.utils.toHex('ETC'),
-            etc.contracts.metToken.options.address,
+            etc.contracts.METToken.options.address,
             etcBuyer1,
             amount,
             fee,
@@ -119,7 +119,7 @@ describe('cross chain testing', () => {
         return reject(error)
       }
 
-      let totalSupplyAfter = await eth.contracts.metToken.methods
+      let totalSupplyAfter = await eth.contracts.METToken.methods
         .totalSupply()
         .call()
       totalSupplyAfter = ethers.utils.bigNumberify(totalSupplyAfter)
@@ -131,19 +131,19 @@ describe('cross chain testing', () => {
       )
       console.log('preparing import data')
       let importDataObj = await util.prepareImportData(eth, receipt)
-      let etcTotalSupply = await etc.contracts.metToken.methods
+      let etcTotalSupply = await etc.contracts.METToken.methods
         .totalSupply()
         .call()
       etcTotalSupply = ethers.utils.bigNumberify(etcTotalSupply)
       let expectedTotalSupply = etcTotalSupply.add(amount).add(fee)
-      var etcBalance = await etc.contracts.metToken.methods
+      var etcBalance = await etc.contracts.METToken.methods
         .balanceOf(etcBuyer1)
         .call()
       etcBalance = ethers.utils.bigNumberify(eth.web3.utils.toHex(etcBalance))
       let expectedBalanceOfRecepient = etcBalance.add(amount)
       console.log('importing - test 1')
       try {
-        receipt = await etc.contracts.metToken.methods
+        receipt = await etc.contracts.METToken.methods
           .importMET(
             eth.web3.utils.toHex('ETH'),
             importDataObj.destinationChain,
@@ -164,7 +164,7 @@ describe('cross chain testing', () => {
         reject(new Error('importMET function reverted'))
       }
       // wait for minting to happen
-      var subs = etc.contracts.tokenPorter.events.LogImport(
+      var subs = etc.contracts.TokenPorter.events.LogImport(
         async (err, response) => {
           if (err) {
             console.log('export error', err)
@@ -194,7 +194,7 @@ describe('cross chain testing', () => {
 
   it('Export test 2. ETC to ETH', () => {
     return new Promise(async (resolve, reject) => {
-      let amount = await etc.contracts.metToken.methods
+      let amount = await etc.contracts.METToken.methods
         .balanceOf(etcBuyer1)
         .call()
       assert(amount > 0, 'Exporter has no MET token balance')
@@ -202,17 +202,17 @@ describe('cross chain testing', () => {
       let fee = ethers.utils.bigNumberify(3e14)
       amount = amount.sub(fee)
       let extraData = 'D'
-      let totalSupplybefore = await etc.contracts.metToken.methods
+      let totalSupplybefore = await etc.contracts.METToken.methods
         .totalSupply()
         .call()
       totalSupplybefore = ethers.utils.bigNumberify(totalSupplybefore)
       console.log('exporting - test 2')
       var receipt
       try {
-        receipt = await etc.contracts.metToken.methods
+        receipt = await etc.contracts.METToken.methods
           .export(
             eth.web3.utils.toHex('ETH'),
-            eth.contracts.metToken.options.address,
+            eth.contracts.METToken.options.address,
             ethBuyer1,
             amount,
             fee,
@@ -225,7 +225,7 @@ describe('cross chain testing', () => {
       if (!receipt.status) {
         reject(new Error('Export function reverted'))
       }
-      let totalSupplyAfter = await etc.contracts.metToken.methods
+      let totalSupplyAfter = await etc.contracts.METToken.methods
         .totalSupply()
         .call()
       totalSupplyAfter = ethers.utils.bigNumberify(totalSupplyAfter)
@@ -234,18 +234,18 @@ describe('cross chain testing', () => {
         'Export from ETH failed'
       )
       let importDataObj = await util.prepareImportData(etc, receipt)
-      let ethTotalSupply = await eth.contracts.metToken.methods
+      let ethTotalSupply = await eth.contracts.METToken.methods
         .totalSupply()
         .call()
       ethTotalSupply = ethers.utils.bigNumberify(ethTotalSupply)
       let expectedTotalSupply = ethTotalSupply.add(amount).add(fee)
-      let balanceOfRecepient = await eth.contracts.metToken.methods
+      let balanceOfRecepient = await eth.contracts.METToken.methods
         .balanceOf(importDataObj.addresses[1])
         .call()
       balanceOfRecepient = ethers.utils.bigNumberify(balanceOfRecepient)
       let expectedBalanceOfRecepient = balanceOfRecepient.add(amount)
       try {
-        receipt = await eth.contracts.metToken.methods
+        receipt = await eth.contracts.METToken.methods
           .importMET(
             eth.web3.utils.toHex('ETC'),
             importDataObj.destinationChain,
@@ -267,7 +267,7 @@ describe('cross chain testing', () => {
       }
 
       // wait for minting to happen
-      var subs = eth.contracts.tokenPorter.events.LogImport(
+      var subs = eth.contracts.TokenPorter.events.LogImport(
         async (err, response) => {
           if (err) {
             console.log('export error', err)
@@ -299,17 +299,17 @@ describe('cross chain testing', () => {
     return new Promise(async (resolve, reject) => {
       // Buy some MET
       await util.getMET(eth, ethBuyer1)
-      let metBalance = await eth.contracts.metToken.methods
+      let metBalance = await eth.contracts.METToken.methods
         .balanceOf(ethBuyer1)
         .call()
       metBalance = ethers.utils.bigNumberify(metBalance)
       let fee = ethers.utils.bigNumberify(2)
       let amount = metBalance.sub(fee)
       let extraData = 'D'
-      await eth.contracts.metToken.methods
+      await eth.contracts.METToken.methods
         .export(
           eth.web3.utils.toHex('ETC'),
-          etc.contracts.metToken.options.address,
+          etc.contracts.METToken.options.address,
           etcBuyer1,
           amount,
           fee,

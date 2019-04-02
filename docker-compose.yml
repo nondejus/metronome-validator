@@ -2,19 +2,33 @@ version: '3.2'
 
 services:
   validator:
+    container_name: validator
     image: metronome-validator:latest
     volumes:
       # - .:/usr/src/metronome-validator
-    network_mode: host
+    network_mode: "service:redis"
+    environment:
+      - etc_http_url=${etc_http_url}
+      - etc_validator_address=${etc_validator_address}
+      - etc_validator_password=${etc_validator_password}
+      - etc_ws_url=${etc_ws_url}
+      - eth_http_url=${eth_http_url}
+      - eth_validator_address=${eth_validator_address}
+      - eth_validator_password=${eth_validator_password}
+      - eth_ws_url=${eth_ws_url}
+      - REDIS_URL=${REDIS_URL}
+      - walletMnemonic=${walletMnemonic}
     depends_on: 
-      - redis-server
+      - redis
     restart: always
-  redis-server:
-    container_name: redis-server
+  redis:
+    image: redis:5.0.3
+    container_name: redis
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "6379:6379"
+    network_mode: host
     volumes:
-      - ../data/redis:/data
+      - ${REDIS_DATA}:/data
     restart: always

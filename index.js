@@ -24,16 +24,15 @@
 */
 
 const program = require('commander')
-const reader = require('./lib/file-reader')
+const process = require('process')
+var config = require('config')
 const constant = require('./lib/const')
 const launcher = require('./lib/launcher')
 
 function init () {
   program
-    .option('-d, --dev', 'Run app in dev environment (without passwords)')
     .command('launch')
     .description('Launch off-chain metronome validator')
-    .arguments('[eth-password] [etc-password]')
     .action(launchValidator)
 
   program.parse(process.argv)
@@ -47,30 +46,24 @@ function launchValidator (ethPassword, etcPassword) {
   //   require('newrelic')
   // }
   var config = createConfigObj()
-  const metronome = reader.readMetronome()
-  launcher.launch(config, metronome)
+  launcher.launch(config)
 }
 
 function createConfigObj () {
-  var config = { eth: {}, etc: {}, qtum: {} }
-  config.eth.chainName = constant.ETH.alias
-  config.eth.httpURL = process.env.eth_http_url
-  config.eth.wsURL = process.env.eth_ws_url
-  config.eth.address = process.env.eth_validator_address
-  config.eth.password = process.env.eth_validator_password
-
-  config.etc.chainName = constant.ETC.alias
-  config.etc.httpURL = process.env.etc_http_url
-  config.etc.wsURL = process.env.etc_ws_url
-  config.etc.address = process.env.etc_validator_address
-  config.etc.password = process.env.etc_validator_password
-
-  config.qtum.chainName = constant.qtum.alias
-  config.qtum.httpURL = process.env.qtum_http_url
-  config.qtum.wsURL = process.env.qtum_ws_url
-  config.qtum.address = process.env.qtum_validator_address
-  config.qtum.password = process.env.qtum_validator_password
+  preareConfig('eth')
+  preareConfig('etc')
+  preareConfig('qtum')
   return config
+}
+
+function preareConfig (chain) {
+  config[chain] = { ...config[chain], ...constant[chain] }
+  config[chain].chainName = chain
+  config[chain].httpURL = process.env[chain + '_http_url']
+  config[chain].wsURL = process.env[chain + '_ws_url']
+  config[chain].address = process.env[chain + '_validator_address']
+  config[chain].password = process.env[chain + '_validator_password']
+  config[chain].walletMnemonic = process.env.walletMnemonic
 }
 
 init()
