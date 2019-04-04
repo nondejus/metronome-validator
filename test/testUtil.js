@@ -26,10 +26,11 @@
 const ethers = require('ethers')
 const MerkleTreeJs = require('merkletreejs')
 const crypto = require('crypto')
+const process = require('process')
 const Chain = require('../lib/chain')
 const constant = require('../lib/const')
-require('dotenv').config()
-var config
+var config = require('config')
+
 // create contract object from abi
 function initContracts () {
   return new Promise(async (resolve, reject) => {
@@ -46,21 +47,19 @@ function initContracts () {
 }
 
 function createConfigObj () {
-  var config = {}
-  config.eth = preareConfig('eth')
-  config.etc = preareConfig('etc')
-  console.log('config', config)
+  preareConfig('eth')
+  preareConfig('etc')
   return config
 }
 
 function preareConfig (chain) {
-  var config = constant[chain]
-  config.chainName = chain
-  config.httpURL = process.env[chain + '_http_url']
-  config.wsURL = process.env[chain + '_ws_url']
-  config.address = process.env[chain + '_validator_address']
-  config.password = process.env[chain + '_validator_password']
-  return config
+  config[chain] = { ...config[chain], ...constant[chain] }
+  config[chain].chainName = chain.toUpperCase()
+  config[chain].httpURL = process.env[chain + '_http_url']
+  config[chain].wsURL = process.env[chain + '_ws_url']
+  config[chain].address = process.env[chain + '_validator_address']
+  config[chain].password = process.env[chain + '_validator_password']
+  config[chain].walletMnemonic = process.env.walletMnemonic
 }
 
 // Create account and send some ether in it

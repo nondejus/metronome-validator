@@ -16,7 +16,7 @@ services:
       - eth_validator_address=${eth_validator_address}
       - eth_validator_password=${eth_validator_password}
       - eth_ws_url=${eth_ws_url}
-      - REDIS_URL=${REDIS_URL}
+      - REDIS_URL=redis://redis:6379
       - walletMnemonic=${walletMnemonic}
     depends_on: 
       - redis

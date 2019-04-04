@@ -1,10 +1,10 @@
 {
   "eth": {
-    "confirmationCount": 0,
+    "confirmationCount": 4000,
     "network": "ropsten"
   },
   "etc": {
-    "confirmationCount": 0,
+    "confirmationCount": 4000,
     "network": "morden"
   },
   "newrelic": {

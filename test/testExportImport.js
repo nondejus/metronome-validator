@@ -44,7 +44,7 @@ before(async () => {
 describe('Export test. ETH to ETC', () => {
   var metBalance
   var receipt = ''
-  var fee = ethers.utils.bigNumberify(2e14)
+  var fee = ethers.utils.bigNumberify(6e14)
   var amount = ethers.utils.bigNumberify(1e14)
   var extraData = 'D'
 
@@ -71,6 +71,11 @@ describe('Export test. ETH to ETC', () => {
       let totalSupplybefore = await ethChain.contracts.METToken.methods
         .totalSupply()
         .call()
+      console.log('totalSupplybefore', totalSupplybefore)
+      console.log('ethBuyer', ethBuyer)
+      console.log('etcChain.contracts.METToken.options.address', etcChain.contracts.METToken.options.address)
+      console.log('etcBuyer', etcBuyer)
+      console.log('fee', fee)
       totalSupplybefore = ethers.utils.bigNumberify(totalSupplybefore)
       try {
         receipt = await ethChain.contracts.METToken.methods.export(
@@ -82,6 +87,7 @@ describe('Export test. ETH to ETC', () => {
           ethChain.web3.utils.toHex(extraData)
         ).send({ from: ethBuyer })
       } catch (error) {
+        console.log('error', error)
         return reject(error)
       }
 
