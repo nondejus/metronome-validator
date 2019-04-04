@@ -5,10 +5,14 @@ services:
     container_name: validator
     image: metronome-validator:latest
     volumes:
-      # - .:/usr/src/metronome-validator
+      - /usr/src/metronome-validator/node_modules
+      - .:/usr/src/metronome-validator
     network_mode: "service:redis"
     environment:
       - etc_http_url=${etc_http_url}
+      - qtum_http_url=${qtum_http_url}
+      - qtum_validator_address=${qtum_validator_address}
+      - qtum_network=${qtum_network}
       - etc_validator_address=${etc_validator_address}
       - etc_validator_password=${etc_validator_password}
       - etc_ws_url=${etc_ws_url}
@@ -16,7 +20,7 @@ services:
       - eth_validator_address=${eth_validator_address}
       - eth_validator_password=${eth_validator_password}
       - eth_ws_url=${eth_ws_url}
-      - REDIS_URL=${REDIS_URL}
+      - REDIS_URL=redis://127.0.0.1:6379/5
       - walletMnemonic=${walletMnemonic}
     depends_on: 
       - redis

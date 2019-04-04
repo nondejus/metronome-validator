@@ -51,14 +51,6 @@ services:
       - 9555:8545
       - 9556:8546
     restart: on-failure
-  redis:
-    container_name: redis
-    image: redis
-    network_mode: host
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - ${REDIS_DATA}:/data
-    restart: always
   qtumd:
     container_name: qtumd
     image: qtum/qtum:0.17.2
@@ -78,31 +70,4 @@ services:
       - -${qtum_network}
     volumes:
       - ${qtum_data_dir}:/dapp
-    restart: always
-  validator:
-    image: metronome-validator:latest
-    container_name: validator
-    network_mode: "service:redis"
-    environment:
-      - etc_http_url=${etc_http_url}
-      - qtum_http_url=${qtum_http_url}
-      - qtum_validator_address=${qtum_validator_address}
-      - qtum_network=${qtum_network}
-      - etc_validator_address=${etc_validator_address}
-      - etc_validator_password=${etc_validator_password}
-      - etc_ws_url=${etc_ws_url}
-      - eth_http_url=${eth_http_url}
-      - eth_validator_address=${eth_validator_address}
-      - eth_validator_password=${eth_validator_password}
-      - eth_ws_url=${eth_ws_url}
-      - REDIS_URL=redis://127.0.0.1:6379/5
-      - walletMnemonic=${walletMnemonic}
-    volumes:
-      - /usr/src/metronome-validator/node_modules
-      - .:/usr/src/metronome-validator
-    depends_on: 
-      - redis
-      - parity-etc-dev
-      - parity-eth-dev
-      - qtumd
     restart: always
