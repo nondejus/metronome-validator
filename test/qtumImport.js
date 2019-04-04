@@ -64,38 +64,39 @@ describe('Chain hop test cases- ETH to QTUM', () => {
     ethChain.web3.eth.personal.unlockAccount(ethBuyer, ethPassword)
   })
 
-  // it('Test case 1: Should be able to export from eth', () => {
-  //   return new Promise(async (resolve, reject) => {
-  //     let recepient = await qChain.qtum.rawCall('gethexaddress', [process.env.qtum_validator_address])
-  //     recepient = '0x' + recepient
-  //     let totalSupplybefore = await ethChain.contracts.METToken.methods
-  //       .totalSupply()
-  //       .call()
-  //     totalSupplybefore = ethers.utils.bigNumberify(totalSupplybefore)
-  //     try {
-  //       receipt = await ethChain.contracts.METToken.methods.export(
-  //         ethChain.web3.utils.toHex('qtum'),
-  //         qChain.contracts.METToken.info.address,
-  //         recepient,
-  //         amount,
-  //         fee,
-  //         ethChain.web3.utils.toHex(extraData)
-  //       ).send({ from: ethBuyer })
-  //     } catch (error) {
-  //       console.log('error', error)
-  //       return reject(error)
-  //     }
+  it('Test case 1: Should be able to export from eth', () => {
+    return new Promise(async (resolve, reject) => {
+      let recepient = await qChain.qtum.rawCall('gethexaddress', [process.env.qtum_validator_address])
+      recepient = '0x' + recepient
+      console.log('ethChain.contracts.METToken', ethChain.contracts.METToken.options.address)
+      let totalSupplybefore = await ethChain.contracts.METToken.methods
+        .totalSupply()
+        .call()
+      totalSupplybefore = ethers.utils.bigNumberify(totalSupplybefore)
+      try {
+        receipt = await ethChain.contracts.METToken.methods.export(
+          ethChain.web3.utils.toHex('qtum'),
+          qChain.contracts.METToken.info.address,
+          recepient,
+          amount,
+          fee,
+          ethChain.web3.utils.toHex(extraData)
+        ).send({ from: ethBuyer })
+      } catch (error) {
+        console.log('error', error)
+        return reject(error)
+      }
 
-  //     let totalSupplyAfter = await ethChain.contracts.METToken.methods.totalSupply().call()
-  //     totalSupplyAfter = ethers.utils.bigNumberify(totalSupplyAfter)
-  //     amount = ethers.utils.bigNumberify(ethChain.web3.utils.toHex(amount))
-  //     fee = ethers.utils.bigNumberify(ethChain.web3.utils.toHex(fee))
-  //     assert(totalSupplybefore.sub(totalSupplyAfter).eq(amount.add(fee)),
-  //       'Export from ETH failed'
-  //     )
-  //     resolve()
-  //   })
-  // })
+      let totalSupplyAfter = await ethChain.contracts.METToken.methods.totalSupply().call()
+      totalSupplyAfter = ethers.utils.bigNumberify(totalSupplyAfter)
+      amount = ethers.utils.bigNumberify(ethChain.web3.utils.toHex(amount))
+      fee = ethers.utils.bigNumberify(ethChain.web3.utils.toHex(fee))
+      assert(totalSupplybefore.sub(totalSupplyAfter).eq(amount.add(fee)),
+        'Export from ETH failed'
+      )
+      resolve()
+    })
+  })
 
   it('Test case 2: Should be able to submit import request in qtum', () => {
     return new Promise(async (resolve, reject) => {
@@ -128,34 +129,35 @@ describe('Chain hop test cases- ETH to QTUM', () => {
     })
   })
 
-  // it('Test case 3: Validators should be able to validate and attest export receipt in qtum', () => {
-  //   return new Promise(async (resolve, reject) => {
-  //     var validator = new Validator(chains, qChain)
-  //     // var burnHash = '0x6b906747a7bf888e5ff8e89f9a08e4aee450d57df46300e370a0e13ef48c2840'
-  //     var burnSequence = await ethChain.contracts.TokenPorter.methods.burnSequence().call()
-  //     var burnHash = await ethChain.contracts.TokenPorter.methods.exportedBurns(burnSequence - 1).call()
-  //     var filter = { currentBurnHash: burnHash }
-  //     var options = { filter, fromBlock: 0, toBlock: 'latest' }
-  //     var logExportReceipt = await ethChain.getPastExportReceipts(options)
-  //     const returnValues = logExportReceipt[0].returnValues
-  //     let originChain = 'ETH'
-  //     let response = await validator.validateHash(originChain.toLowerCase(), returnValues.currentBurnHash)
-  //     assert(response.hashExist, 'Validations failed')
-  //     let attstBefore = await qChain.call(qChain.contracts.Validator, 'attestationCount', [returnValues.currentBurnHash])
-  //     let balanceBefore = await qChain.call(qChain.contracts.METToken, 'balanceOf', [returnValues.destinationRecipientAddr])
-  //     await validator.attestHash(originChain, returnValues)
-  //     let attstAfter = await qChain.call(qChain.contracts.Validator, 'attestationCount', [returnValues.currentBurnHash])
-  //     assert(attstAfter, attstBefore + 1, 'attestation failed')
-  //     let threshold = await qChain.call(qChain.contracts.Validator, 'threshold')
-  //     if (threshold.toString() === '1') {
-  //       let hashClaimed = await qChain.call(qChain.contracts.Validator, 'hashClaimed', [returnValues.currentBurnHash])
-  //       assert(hashClaimed, 'Minting failed after attestation')
-  //       let balanceAfter = await qChain.call(qChain.contracts.METToken, 'balanceOf', [returnValues.destinationRecipientAddr])
-  //       balanceAfter = ethers.utils.bigNumberify(balanceAfter.toString())
-  //       balanceBefore = ethers.utils.bigNumberify(balanceBefore.toString())
-  //       assert(balanceAfter.eq(balanceBefore.add(amount.add(fee))))
-  //     }
-  //     resolve()
-  //   })
-  // })
+  it('Test case 3: Validators should be able to validate and attest export receipt in qtum', () => {
+    return new Promise(async (resolve, reject) => {
+      var validator = new Validator(chains, qChain)
+      // var burnHash = '0x6b906747a7bf888e5ff8e89f9a08e4aee450d57df46300e370a0e13ef48c2840'
+      var burnSequence = await ethChain.contracts.TokenPorter.methods.burnSequence().call()
+      var burnHash = await ethChain.contracts.TokenPorter.methods.exportedBurns(burnSequence - 1).call()
+      var filter = { currentBurnHash: burnHash }
+      var options = { filter, fromBlock: 0, toBlock: 'latest' }
+      var logExportReceipt = await ethChain.getPastExportReceipts(options)
+      const returnValues = logExportReceipt[0].returnValues
+      let originChain = 'ETH'
+      let response = await validator.validateHash(originChain.toLowerCase(), returnValues.currentBurnHash)
+      console.log('response', response)
+      assert(response.hashExist, 'Validations failed')
+      let attstBefore = await qChain.call(qChain.contracts.Validator, 'attestationCount', [returnValues.currentBurnHash])
+      let balanceBefore = await qChain.call(qChain.contracts.METToken, 'balanceOf', [returnValues.destinationRecipientAddr])
+      await validator.attestHash(originChain, returnValues)
+      let attstAfter = await qChain.call(qChain.contracts.Validator, 'attestationCount', [returnValues.currentBurnHash])
+      assert(attstAfter, attstBefore + 1, 'attestation failed')
+      let threshold = await qChain.call(qChain.contracts.Validator, 'threshold')
+      if (threshold.toString() === '1') {
+        let hashClaimed = await qChain.call(qChain.contracts.Validator, 'hashClaimed', [returnValues.currentBurnHash])
+        assert(hashClaimed, 'Minting failed after attestation')
+        let balanceAfter = await qChain.call(qChain.contracts.METToken, 'balanceOf', [returnValues.destinationRecipientAddr])
+        balanceAfter = ethers.utils.bigNumberify(balanceAfter.toString())
+        balanceBefore = ethers.utils.bigNumberify(balanceBefore.toString())
+        assert(balanceAfter.eq(balanceBefore.add(amount.add(fee))))
+      }
+      resolve()
+    })
+  })
 })

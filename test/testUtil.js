@@ -25,12 +25,14 @@
 
 const ethers = require('ethers')
 const MerkleTreeJs = require('merkletreejs')
+const MetronomeContracts = require('metronome-contracts')
 const crypto = require('crypto')
 const reader = require('../lib/file-reader')
 const Chain = require('../lib/chain')
 const QChain = require('../lib/qChain')
 var config = require('config')
 const constant = require('../lib/const')
+const Web3 = require('web3')
 require('dotenv').config()
 // create contract object from abi
 function initContracts () {
@@ -38,9 +40,13 @@ function initContracts () {
     let ethChain, etcChain, qChain
     var config = createConfigObj()
     let metronomeContracts = reader.readMetronome()
+    var options = { timeout: 10000, autoReconnect: true }
+    let web3 = new Web3()
+    web3.setProvider(new Web3.providers.WebsocketProvider(config.eth.wsURL, options))
     // create chain object to get contracts
-    ethChain = new Chain(config.eth, metronomeContracts.eth)
-    etcChain = new Chain(config.etc, metronomeContracts.etc)
+    ethChain = new Chain(config.eth, new MetronomeContracts(web3, config.eth.network))
+    web3.setProvider(new Web3.providers.WebsocketProvider(config.etc.wsURL, options))
+    etcChain = new Chain(config.etc, new MetronomeContracts(web3, config.etc.network))
     qChain = new QChain(config.qtum, metronomeContracts.qtum)
     resolve({
       eth: ethChain,
@@ -59,7 +65,6 @@ function createConfigObj () {
 
 function preareConfig (chain) {
   config[chain] = { ...config[chain], ...constant[chain] }
-  console.log('config[chain]', config[chain])
   config[chain].chainName = chain
   config[chain].httpURL = process.env[chain + '_http_url']
   config[chain].wsURL = process.env[chain + '_ws_url']
