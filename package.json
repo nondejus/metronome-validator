@@ -44,7 +44,7 @@
     "lerna": "^3.8.5",
     "lodash": "^4.17.10",
     "merkletreejs": "0.0.9",
-    "metronome-contracts": "https://github.com/patidarmanoj10/metronome-contracts-js/tarball/new-test-contracts",
+    "metronome-contracts": "https://github.com/patidarmanoj10/metronome-contracts-js",
     "newrelic": "^4.9.0",
     "qtumjs": "^1.9.1",
     "qweb3": "^1.2.2",
