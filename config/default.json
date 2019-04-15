@@ -1,11 +1,11 @@
 {
   "eth": {
     "confirmationCount": 0,
-    "network": "deveth"
+    "network": "ropsten"
   },
   "etc": {
     "confirmationCount": 0,
-    "network": "devetc"
+    "network": "morden"
   },
   "qtum": {
     "confirmationCount": 0,
