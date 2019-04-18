@@ -44,8 +44,8 @@ before(async () => {
 describe('Export test. ETH to ETC', () => {
   var metBalance
   var receipt = ''
-  var fee = ethers.utils.bigNumberify(6e14)
-  var amount = ethers.utils.bigNumberify(1e14)
+  var fee = ethers.utils.bigNumberify(1e14)
+  var amount = ethers.utils.bigNumberify(6e14)
   var extraData = 'D'
 
   before(async () => {
@@ -107,7 +107,7 @@ describe('Export test. ETH to ETC', () => {
       var burnSequence = await ethChain.contracts.TokenPorter.methods.burnSequence().call()
       var burnHash = await ethChain.contracts.TokenPorter.methods.exportedBurns(burnSequence - 1).call()
       var filter = { currentBurnHash: burnHash }
-      var options = { filter, fromBlock: 0, toBlock: 'latest' }
+      var options = { filter, fromBlock: 3757156, toBlock: 'latest' }
       let importDataObj = await util.prepareImportData(ethChain, options)
       try {
         await etcChain.contracts.METToken.methods.importMET(
@@ -135,9 +135,10 @@ describe('Export test. ETH to ETC', () => {
       var burnSequence = await ethChain.contracts.TokenPorter.methods.burnSequence().call()
       var burnHash = await ethChain.contracts.TokenPorter.methods.exportedBurns(burnSequence - 1).call()
       var filter = { currentBurnHash: burnHash }
-      var options = { filter, fromBlock: 0, toBlock: 'latest' }
+      var options = { filter, fromBlock: 3757156, toBlock: 'latest' }
       var logExportReceipt = await ethChain.contracts.TokenPorter.getPastEvents('LogExportReceipt', options)
       const returnValues = logExportReceipt[0].returnValues
+      console.log('returnValues', returnValues)
       let originChain = 'ETH'
       let response = await validator.validateHash(originChain.toLowerCase(), returnValues.currentBurnHash)
       assert(response.hashExist, 'Validations failed')
@@ -147,7 +148,9 @@ describe('Export test. ETH to ETC', () => {
         .call()
       await validator.attestHash(originChain, returnValues)
       let attstAfter = await etcChain.contracts.Validator.methods.attestationCount(returnValues.currentBurnHash).call()
-      assert(attstAfter, attstBefore + 1, 'attestation failed')
+      console.log('attstAfter', attstAfter)
+      console.log('attstBefore', attstBefore)
+      assert.equal(attstAfter, 1, 'attestation failed')
 
       let threshold = await etcChain.contracts.Validator.methods.threshold().call()
       if (threshold === '1') {
@@ -166,10 +169,17 @@ describe('Export test. ETH to ETC', () => {
 
   it('Should be able to export from etc', () => {
     return new Promise(async (resolve, reject) => {
+      fee = ethers.utils.bigNumberify(1e14)
+      amount = ethers.utils.bigNumberify(2e14)
       let totalSupplybefore = await etcChain.contracts.METToken.methods
         .totalSupply()
         .call()
       totalSupplybefore = ethers.utils.bigNumberify(totalSupplybefore)
+      metBalance = await etcChain.contracts.METToken.methods
+        .balanceOf(etcBuyer)
+        .call()
+      console.log('metBalance', metBalance)
+      console.log('totalSupplybefore', totalSupplybefore)
       try {
         receipt = await etcChain.contracts.METToken.methods.export(
           ethChain.web3.utils.toHex('ETH'),
@@ -185,6 +195,11 @@ describe('Export test. ETH to ETC', () => {
 
       let totalSupplyAfter = await etcChain.contracts.METToken.methods.totalSupply().call()
       totalSupplyAfter = ethers.utils.bigNumberify(totalSupplyAfter)
+      metBalance = await etcChain.contracts.METToken.methods
+        .balanceOf(etcBuyer)
+        .call()
+      console.log('metBalance', metBalance)
+      console.log('totalSupplyAfter', totalSupplyAfter)
       amount = ethers.utils.bigNumberify(ethChain.web3.utils.toHex(amount))
       fee = ethers.utils.bigNumberify(ethChain.web3.utils.toHex(fee))
       assert(totalSupplybefore.sub(totalSupplyAfter).eq(amount.add(fee)),
@@ -199,7 +214,7 @@ describe('Export test. ETH to ETC', () => {
       var burnSequence = await etcChain.contracts.TokenPorter.methods.burnSequence().call()
       var burnHash = await etcChain.contracts.TokenPorter.methods.exportedBurns(burnSequence - 1).call()
       var filter = { currentBurnHash: burnHash }
-      var options = { filter, fromBlock: 0, toBlock: 'latest' }
+      var options = { filter, fromBlock: 3757156, toBlock: 'latest' }
       let importDataObj = await util.prepareImportData(etcChain, options)
       try {
         await ethChain.contracts.METToken.methods.importMET(
@@ -227,7 +242,7 @@ describe('Export test. ETH to ETC', () => {
       var burnSequence = await etcChain.contracts.TokenPorter.methods.burnSequence().call()
       var burnHash = await etcChain.contracts.TokenPorter.methods.exportedBurns(burnSequence - 1).call()
       var filter = { currentBurnHash: burnHash }
-      var options = { filter, fromBlock: 0, toBlock: 'latest' }
+      var options = { filter, fromBlock: 3757156, toBlock: 'latest' }
       var logExportReceipt = await etcChain.contracts.TokenPorter.getPastEvents('LogExportReceipt', options)
       const returnValues = logExportReceipt[0].returnValues
       let originChain = 'ETC'
@@ -239,7 +254,7 @@ describe('Export test. ETH to ETC', () => {
         .call()
       await validator.attestHash(originChain, returnValues)
       let attstAfter = await ethChain.contracts.Validator.methods.attestationCount(returnValues.currentBurnHash).call()
-      assert(attstAfter, attstBefore + 1, 'attestation failed')
+      assert.equal(attstAfter, attstBefore + 1, 'attestation failed')
 
       let threshold = await ethChain.contracts.Validator.methods.threshold().call()
       if (threshold === '1') {

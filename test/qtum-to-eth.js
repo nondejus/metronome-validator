@@ -37,11 +37,12 @@ var ethChain, qChain, chains
 
 before(async () => {
   chains = await util.initContracts()
+  console.log('2')
   ethChain = chains.eth
   qChain = chains.qtum
   exporterHexAddress = await qChain.qtum.rawCall('gethexaddress', [exporter])
-  console.log('adding dest chain and validators')
-  await qChain.send(qChain.contracts.TokenPorter, 'addDestinationChain', [ethChain.web3.utils.toHex('ETH'), ethChain.contracts.METToken.options.address], { senderAddress: exporter })
+  // console.log('adding dest chain and validators')
+  // await qChain.send(qChain.contracts.TokenPorter, 'addDestinationChain', [ethChain.web3.utils.toHex('ETH'), ethChain.contracts.METToken.options.address], { senderAddress: exporter })
 })
 
 describe('Chain hop test cases. QTUM to ETH', () => {
@@ -52,7 +53,9 @@ describe('Chain hop test cases. QTUM to ETH', () => {
   var extraData = 'D'
 
   before(async () => {
+    console.log('3')
     metBalance = await qChain.call(qChain.contracts.METToken, 'balanceOf', [ exporterHexAddress ])
+    console.log('4')
     assert(metBalance > 0, 'Exporter has no MET token balance')
     metBalance = ethers.utils.bigNumberify(metBalance.toString())
   })
