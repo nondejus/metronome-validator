@@ -1,6 +1,6 @@
 {
   "name": "metronome-validator",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "description": "Metronome off chain validators",
   "main": "index.js",
   "preferGlobal": true,
@@ -39,7 +39,7 @@
     "lerna": "^3.8.5",
     "lodash": "^4.17.10",
     "merkletreejs": "0.0.9",
-    "metronome-contracts": "^2.0.0",
+    "metronome-contracts": "2.1.0",
     "newrelic": "^4.9.0",
     "redis": "^2.8.0",
     "truffle-hdwallet-provider": "^1.0.4",
