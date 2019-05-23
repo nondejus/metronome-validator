@@ -49,13 +49,13 @@ function launchValidator (ethPassword, etcPassword) {
 }
 
 function createConfigObj () {
-  preareConfig('eth')
-  preareConfig('etc')
-  console.log(config)
+  prepareConfig('eth')
+  prepareConfig('etc')
+  // console.log(config)
   return config
 }
 
-function preareConfig (chain) {
+function prepareConfig (chain) {
   config[chain] = { ...config[chain], ...constant[chain] }
   config[chain].chainName = chain.toUpperCase()
   config[chain].httpURL = process.env[chain + '_http_url']
