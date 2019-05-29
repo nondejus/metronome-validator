@@ -11,6 +11,7 @@
     "postinstall": "patch-package",
     "docker:build": "docker build -t metronome-validator .",
     "docker-compose:up": " docker-compose -f docker-compose.dev.yml up --force-recreate",
+    "metec2": "./node_modules/.bin/metec2",
     "test": "./node_modules/.bin/mocha ./test/testExportImport.js --timeout 100000 --exit"
   },
   "author": "",
@@ -40,6 +41,7 @@
     "lodash": "^4.17.10",
     "merkletreejs": "0.0.9",
     "metronome-contracts": "2.1.0",
+    "metronome-parity-nodes": "1.0.2",
     "newrelic": "^4.9.0",
     "redis": "^2.8.0",
     "truffle-hdwallet-provider": "^1.0.4",
