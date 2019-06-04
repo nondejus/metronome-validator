@@ -39,13 +39,5 @@ Metronome off chain validators to validate export receipt and attest the same in
    
 4. docker-compose up
 
-<b>Private network:</b>
-1. Git clone https://github.com/autonomoussoftware/metronome-contracts-js .
-2. Deploy new contracts in private network.
-3. Define network name, update abi, address in metronome-contracts-js.
-4. set network name in ./config/default.json. Must be same as defined in #3.
-3. Update package.json of metronome validators to use local metronome-contract-js package
-4. docker-compose -f docker-compose.dev.yml up 
-
 ### License 
 MIT
