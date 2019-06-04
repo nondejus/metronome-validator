@@ -10,9 +10,8 @@ Metronome off chain validators to validate export receipt and attest the same in
 
 ### Setup & Installing 
 <b>Testnet and Mainet:</b>
-1. Create metronome validators. using command docker build -t metronome-validator .
-2. set appropriate network name in ./config/default.json
-3. Set env variables
+1. Create metronome validators. using command docker build -t metronome-validator 
+2. Set env variables
 
       eth_http_url=\<ETH node http url:port>
 
