@@ -3,7 +3,7 @@ version: '3.2'
 services:
   valiator:
     container_name: validator
-    image: metronome-validator:latest
+    image: bloq/metronome-validator:latest
     network_mode: "service:redis"
     # volumes:
     #   - /usr/src/metronome-validator/node_modules

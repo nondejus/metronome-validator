@@ -1,6 +1,6 @@
 {
   "name": "metronome-validator",
-  "version": "2.1.0",
+  "version": "2.0.0",
   "description": "Metronome off chain validators",
   "main": "index.js",
   "preferGlobal": true,
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "postinstall": "patch-package",
-    "docker:build": "docker build -t metronome-validator .",
+    "docker:build": "docker build -t bloq/metronome-validator .",
     "docker-compose:up": " docker-compose -f docker-compose.dev.yml up --force-recreate",
     "metec2": "./node_modules/.bin/metec2",
     "test": "./node_modules/.bin/mocha ./test/testExportImport.js --timeout 100000 --exit"

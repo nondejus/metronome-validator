@@ -9,11 +9,11 @@
   },
   "newrelic": {
     "appName": "metronome-validator-testnet",
-    "licenseKey": "4dced28d5c5335262086ab0851c7f0ae6cf60d50"
+    "licenseKey": ""
   },
   "gasPrice": 30000000000,
   "parpertrail": {
-    "host": "logs6.papertrailapp.com",
+    "host": "",
     "port": 28696
   },
   "synctolerance": 18000 
