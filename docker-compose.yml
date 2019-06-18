@@ -1,13 +1,14 @@
 version: '3.2'
 
 services:
-  valiator:
+  validator:
     container_name: validator
     image: bloq/metronome-validator:latest
     network_mode: "service:redis"
-    # volumes:
-    #   - /usr/src/metronome-validator/node_modules
-    #   - .:/usr/src/metronome-validator
+    volumes:
+      #- /usr/src/metronome-validator/node_modules
+      #- .:/usr/src/metronome-validator
+      - .:/usr/src/metronome-validator/logs
     environment:
       - etc_http_url=${etc_http_url}
       - etc_validator_address=${etc_validator_address}
