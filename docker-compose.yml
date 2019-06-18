@@ -1,7 +1,7 @@
 version: '3.2'
 
 services:
-  valiator:
+  validator:
     container_name: validator
     image: bloq/metronome-validator:latest
     network_mode: "service:redis"
