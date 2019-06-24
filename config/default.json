@@ -1,20 +1,20 @@
 {
-  "eth": {
-    "confirmationCount": 0,
-    "network": "ropsten"
-  },
-  "etc": {
-    "confirmationCount": 0,
-    "network": "morden"
-  },
-  "newrelic": {
-    "appName": "metronome-validator-testnet",
-    "licenseKey": ""
-  },
-  "gasPrice": 30000000000,
-  "parpertrail": {
-    "host": "logs.papertrailapp.com",
-    "port": 31848
-  },
-  "synctolerance": 18000 
-}
+    "eth": {
+      "confirmationCount": 5000,
+      "network": "mainnet"
+    },
+    "etc": {
+      "confirmationCount": 5000,
+      "network": "classic"
+    },
+    "newrelic": {
+      "appName": "metronome-validator",
+      "licenseKey": ""
+    },
+    "gasPrice": 5000000000,
+    "parpertrail": {
+      "host": "logs.papertrailapp.com",
+      "port": 31848
+    },
+    "synctolerance": 18000 
+  }
