@@ -12,9 +12,6 @@ WORKDIR /usr/src/metronome-validator
 COPY package.json .
 COPY package-lock.json .
 RUN npm install
-# Install dependencies again to ensure all packages are available
-RUN npm install
 COPY . .
-RUN rm .env
 RUN npm run postinstall
 CMD ["node", "index.js", "launch"]
