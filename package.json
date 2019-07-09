@@ -1,6 +1,6 @@
 {
   "name": "metronome-validator",
-  "version": "2.0.0",
+  "version": "2.4.2",
   "description": "Metronome off chain validators",
   "main": "index.js",
   "preferGlobal": true,
@@ -35,7 +35,7 @@
     "config": "^2.0.1",
     "cron": "^1.4.1",
     "dotenv": "^6.2.0",
-    "ethers": "^4.0.7",
+    "ethers": "^4.0.32",
     "ethjs-abi": "^0.2.1",
     "lerna": "^3.8.5",
     "lodash": "^4.17.10",
