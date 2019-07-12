@@ -8,6 +8,7 @@
     "metronome-validator": "index.js"
   },
   "scripts": {
+    "proposal": "node proposal.js",
     "postinstall": "patch-package",
     "docker:build": "docker build -t bloq/metronome-validator .",
     "docker-compose:up": " docker-compose -f docker-compose.dev.yml up --force-recreate",

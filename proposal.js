@@ -21,11 +21,14 @@ async function init () {
     }
     await proposals.createProposal(chain.contracts.Proposals, action, response.q2, process.env[chain.name + '_validator_address'])
   } else if (response.q2 === 'Vote for a proposal') {
-    var proposalList = await proposals.viewProposals(chain.contracts.Proposals, 4924666)
-    console.log('Below is list of proposals open for vote. please select proposal which you want to vote')
-    console.log(proposalList)
-    response = await inquirer.prompt(prepareQuesitonSet(proposalList))
-    console.log('proposal selected', response)
+    var proposalList = await proposals.viewProposals(chain.contracts.Proposals, chain.birthblock)
+    var myVote = await inquirer.prompt(prepareQuesitonSet(proposalList))
+    console.log('Please review your vote before submitting')
+    console.log(myVote.vote)
+    console.log(myVote.prop)
+    response = await inquirer.prompt(questions.set5)
+    myVote = JSON.parse(myVote.prop)
+    await proposals.voteForProposal(chain.contracts.Proposals, myVote.proposalId, process.env[chain.name + '_validator_address'], response.confirm)
   }
 }
 
@@ -41,6 +44,7 @@ async function initContract (chain) {
   }
   obj.web3 = new Web3(provider)
   obj.contracts = new MetronomeContracts(obj.web3, config[chain].network)
+  obj.birthblock = MetronomeContracts[config[chain].network].METToken.birthblock
   return obj
 }
 
@@ -53,9 +57,9 @@ function prepareQuesitonSet (proposalList) {
       choices: proposalList.map(item => {
         return JSON.stringify(item)
       })
-    },
-    questions.set4[0]
+    }
   ]
+  set3 = set3.concat(questions.set4)
   return set3
 }
 
