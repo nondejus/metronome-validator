@@ -8,6 +8,7 @@
     "metronome-validator": "index.js"
   },
   "scripts": {
+    "proposal": "node proposal.js",
     "postinstall": "patch-package",
     "docker:build": "docker build -t bloq/metronome-validator .",
     "docker-compose:up": " docker-compose -f docker-compose.dev.yml up --force-recreate",
@@ -37,6 +38,7 @@
     "dotenv": "^6.2.0",
     "ethers": "^4.0.7",
     "ethjs-abi": "^0.2.1",
+    "inquirer": "^6.4.1",
     "lerna": "^3.8.5",
     "lodash": "^4.17.10",
     "merkletreejs": "0.0.9",
