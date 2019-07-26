@@ -28,6 +28,7 @@ const MerkleTreeJs = require('merkletreejs')
 const MetronomeContracts = require('metronome-contracts')
 const crypto = require('crypto')
 const reader = require('../lib/file-reader')
+const HDWalletProvider = require('truffle-hdwallet-provider')
 const Chain = require('../lib/chain')
 const QChain = require('../lib/qChain')
 var config = require('config')
@@ -40,14 +41,20 @@ function initContracts () {
     let ethChain, etcChain, qChain
     var config = createConfigObj()
     let metronomeContracts = reader.readMetronome()
-    var options = { timeout: 10000, autoReconnect: true }
-    let web3 = new Web3()
-    web3.setProvider(new Web3.providers.WebsocketProvider(config.eth.wsURL, options))
-    // create chain object to get contracts
-    ethChain = new Chain(config.eth, new MetronomeContracts(web3, config.eth.network))
-    web3.setProvider(new Web3.providers.WebsocketProvider(config.etc.wsURL, options))
-    etcChain = new Chain(config.etc, new MetronomeContracts(web3, config.etc.network))
+    var provider = new HDWalletProvider(
+      config.eth.walletMnemonic,
+      config.eth.httpURL, 0, 1, true, "m/44'/60'/0'/0/")
+    ethChain = new Chain(config.eth)
+    ethChain.createContractObj()
+    ethChain.contracts = new MetronomeContracts(new Web3(provider), config.eth.network)
+    etcChain = new Chain(config.etc)
+    provider = new HDWalletProvider(
+      config.etc.walletMnemonic,
+      config.etc.httpURL, 0, 1, true, "m/44'/60'/0'/0/")
+    etcChain.createContractObj()
+    etcChain.contracts = new MetronomeContracts(new Web3(provider), config.etc.network)
     qChain = new QChain(config.qtum, metronomeContracts.qtum)
+    qChain.createContractObj()
     resolve({
       eth: ethChain,
       qtum: qChain,
