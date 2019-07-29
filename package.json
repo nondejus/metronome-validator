@@ -49,7 +49,7 @@
     "merkletreejs": "0.0.9",
     "metronome-contracts": "2.4.0",
     "newrelic": "^4.9.0",
-    "qtumjs": "^1.9.1",
+    "qtumjs": "^1.9.3",
     "qweb3": "^1.2.2",
     "redis": "^2.8.0",
     "truffle-hdwallet-provider": "^1.0.4",
