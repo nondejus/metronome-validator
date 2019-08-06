@@ -1,9 +1,9 @@
 version: '3.2'
 
 services:
-  validator:
-    container_name: validator
-    image: metronome-validator:latest
+  validator-v3:
+    container_name: validator-v3
+    image: metronome-validator-v3:latest
     volumes:
       - /usr/src/metronome-validator/node_modules
       - .:/usr/src/metronome-validator
@@ -15,6 +15,8 @@ services:
       - qtum_network=${qtum_network}
       - etc_validator_address=${etc_validator_address}
       - etc_validator_password=${etc_validator_password}
+      - eth_keystore_filename=${eth_keystore_filename}
+      - etc_keystore_filename=${etc_keystore_filename}
       - etc_ws_url=${etc_ws_url}
       - eth_http_url=${eth_http_url}
       - eth_validator_address=${eth_validator_address}
@@ -22,6 +24,7 @@ services:
       - eth_ws_url=${eth_ws_url}
       - REDIS_URL=redis://127.0.0.1:6379/5
       - walletMnemonic=${walletMnemonic}
+      - uselocalkeystore=${uselocalkeystore}
     depends_on: 
       - redis
     restart: always

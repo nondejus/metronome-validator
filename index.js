@@ -50,20 +50,25 @@ function launchValidator (ethPassword, etcPassword) {
 }
 
 function createConfigObj () {
-  preareConfig('eth')
-  preareConfig('etc')
-  preareConfig('qtum')
+  prepareConfig('eth')
+  prepareConfig('etc')
+  prepareConfig('qtum')
   return config
 }
 
-function preareConfig (chain) {
+function prepareConfig (chain) {
   config[chain] = { ...config[chain], ...constant[chain] }
   config[chain].chainName = chain
   config[chain].httpURL = process.env[chain + '_http_url']
   config[chain].wsURL = process.env[chain + '_ws_url']
-  config[chain].address = process.env[chain + '_validator_address']
   config[chain].password = process.env[chain + '_validator_password']
-  config[chain].walletMnemonic = process.env.walletMnemonic
+  if (process.env.uselocalkeystore === 'yes') {
+    config[chain].uselocalkeystore = process.env.uselocalkeystore
+    config[chain].keystore_filename = process.env[chain + '_keystore_filename']
+  } else {
+    config[chain].walletMnemonic = process.env.walletMnemonic
+    config[chain].address = process.env[chain + '_validator_address']
+  }
 }
 
 init()

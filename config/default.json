@@ -17,8 +17,8 @@
   },
   "gasPrice": 30000000000,
   "parpertrail": {
-    "host": "logs6.papertrailapp.com",
-    "port": 28696
+    "host": "logs.papertrailapp.com",
+    "port": 31848
   },
   "synctolerance": 18000 
 }
