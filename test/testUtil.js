@@ -41,18 +41,23 @@ function initContracts () {
     let ethChain, etcChain, qChain
     var config = createConfigObj()
     let metronomeContracts = reader.readMetronome()
-    var provider = new HDWalletProvider(
-      config.eth.walletMnemonic,
-      config.eth.httpURL, 0, 1, true, "m/44'/60'/0'/0/")
+    var web3 = new Web3(config.eth.httpURL)
+    var wallet = await ethers.Wallet.fromMnemonic(config.eth.walletMnemonic)
+    const account = web3.eth.accounts.privateKeyToAccount(wallet.signingKey.privateKey)
+    web3.eth.accounts.wallet.add(account)
+    web3.eth.defaultAccount = account.address
+    // var provider = new HDWalletProvider(
+    //   config.eth.walletMnemonic,
+    //   config.eth.httpURL, 0, 1, true, "m/44'/60'/0'/0/")
     ethChain = new Chain(config.eth)
     ethChain.createContractObj()
-    ethChain.contracts = new MetronomeContracts(new Web3(provider), config.eth.network)
+    ethChain.contracts = new MetronomeContracts(web3, config.eth.network)
     etcChain = new Chain(config.etc)
-    provider = new HDWalletProvider(
-      config.etc.walletMnemonic,
-      config.etc.httpURL, 0, 1, true, "m/44'/60'/0'/0/")
+    // provider = new HDWalletProvider(
+    //   config.etc.walletMnemonic,
+    //   config.etc.httpURL, 0, 1, true, "m/44'/60'/0'/0/")
     etcChain.createContractObj()
-    etcChain.contracts = new MetronomeContracts(new Web3(provider), config.etc.network)
+    etcChain.contracts = new MetronomeContracts(web3, config.etc.network)
     qChain = new QChain(config.qtum, metronomeContracts.qtum)
     qChain.createContractObj()
     resolve({
