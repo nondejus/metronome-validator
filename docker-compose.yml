@@ -23,7 +23,9 @@ services:
       - eth_validator_password=${eth_validator_password}
       - eth_ws_url=${eth_ws_url}
       - REDIS_URL=redis://127.0.0.1:6379/5
-      - walletMnemonic=${walletMnemonic}
+      - eth_walletMnemonic=${eth_walletMnemonic}
+      - etc_walletMnemonic=${etc_walletMnemonic}
+      - qtum_walletMnemonic=${qtum_walletMnemonic}
       - uselocalkeystore=${uselocalkeystore}
     depends_on: 
       - redis

@@ -82,7 +82,7 @@ function preareConfig (chain) {
   config[chain].wsURL = process.env[chain + '_ws_url']
   config[chain].address = process.env[chain + '_validator_address']
   config[chain].password = process.env[chain + '_validator_password']
-  config[chain].walletMnemonic = process.env.walletMnemonic
+  config[chain].walletMnemonic = process.env[chain + '_walletMnemonic']
 }
 
 // Create account and send some ether in it

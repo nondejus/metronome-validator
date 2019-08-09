@@ -66,7 +66,7 @@ function prepareConfig (chain) {
     config[chain].uselocalkeystore = process.env.uselocalkeystore
     config[chain].keystore_filename = process.env[chain + '_keystore_filename']
   } else {
-    config[chain].walletMnemonic = process.env.walletMnemonic
+    config[chain].walletMnemonic = process.env[chain + '_walletMnemonic']
     config[chain].address = process.env[chain + '_validator_address']
   }
 }
