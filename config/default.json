@@ -9,6 +9,7 @@
   },
   "qtum": {
     "confirmationCount": 0,
+    "networkAlias": "qtumTestnet",
     "network": "testnet"
   },
   "newrelic": {

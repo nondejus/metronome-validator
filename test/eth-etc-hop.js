@@ -29,9 +29,7 @@ const Validator = require('../lib/validator')
 require('dotenv').config()
 
 var ethBuyer = process.env.eth_validator_address
-var ethPassword = process.env.eth_validator_password
 var etcBuyer = process.env.etc_validator_address
-var etcPassword = process.env.etc_validator_password
 var chains
 var ethChain, etcChain
 
@@ -43,13 +41,12 @@ before(async () => {
 
 describe('Export test. ETH to ETC', () => {
   var metBalance
-  var receipt = ''
-  var fee = ethers.utils.bigNumberify(1e14)
-  var amount = ethers.utils.bigNumberify(6e14)
+  var fee = ethers.utils.bigNumberify(1e12)
+  var amount = ethers.utils.bigNumberify(1e12)
   var extraData = 'D'
 
   before(async () => {
-    await util.getMET(ethChain, ethBuyer)
+    // await util.getMET(ethChain, ethBuyer)
     metBalance = await ethChain.contracts.METToken.methods
       .balanceOf(ethBuyer)
       .call()
@@ -59,11 +56,6 @@ describe('Export test. ETH to ETC', () => {
   })
 
   beforeEach(async () => {
-    var unlocked
-    unlocked = await ethChain.web3.eth.personal.unlockAccount(ethBuyer, ethPassword)
-    console.log('unlocked', unlocked)
-    unlocked = await etcChain.web3.eth.personal.unlockAccount(etcBuyer, etcPassword)
-    console.log('unlocked', unlocked)
   })
 
   it('Should be able to export from eth', () => {
@@ -71,21 +63,17 @@ describe('Export test. ETH to ETC', () => {
       let totalSupplybefore = await ethChain.contracts.METToken.methods
         .totalSupply()
         .call()
-      console.log('totalSupplybefore', totalSupplybefore)
-      console.log('ethBuyer', ethBuyer)
-      console.log('etcChain.contracts.METToken.options.address', etcChain.contracts.METToken.options.address)
-      console.log('etcBuyer', etcBuyer)
-      console.log('fee', fee)
       totalSupplybefore = ethers.utils.bigNumberify(totalSupplybefore)
+      console.log('totalSupplybefore', totalSupplybefore)
       try {
-        receipt = await ethChain.contracts.METToken.methods.export(
+        await ethChain.contracts.METToken.methods.export(
           ethChain.web3.utils.toHex('ETC'),
           etcChain.contracts.METToken.options.address,
           etcBuyer,
           amount,
           fee,
           ethChain.web3.utils.toHex(extraData)
-        ).send({ from: ethBuyer })
+        ).send({ from: ethBuyer, gasPrice: 20000000000, gas: 500000 })
       } catch (error) {
         console.log('error', error)
         return reject(error)
@@ -93,6 +81,7 @@ describe('Export test. ETH to ETC', () => {
 
       let totalSupplyAfter = await ethChain.contracts.METToken.methods.totalSupply().call()
       totalSupplyAfter = ethers.utils.bigNumberify(totalSupplyAfter)
+      console.log('totalSupplyAfter', totalSupplyAfter)
       amount = ethers.utils.bigNumberify(ethChain.web3.utils.toHex(amount))
       fee = ethers.utils.bigNumberify(ethChain.web3.utils.toHex(fee))
       assert(totalSupplybefore.sub(totalSupplyAfter).eq(amount.add(fee)),
@@ -105,10 +94,20 @@ describe('Export test. ETH to ETC', () => {
   it('Should be able to import in etc', () => {
     return new Promise(async (resolve, reject) => {
       var burnSequence = await ethChain.contracts.TokenPorter.methods.burnSequence().call()
+      console.log('burnSequence', burnSequence)
+      // var etcWsURL = 'ws://ec2-54-172-219-152.compute-1.amazonaws.com:8556'
+      // var web3 = new Web3(new Web3.providers.WebsocketProvider(etcWsURL))
+      // var contracts = new MetronomeContracts(web3, 'morden')
       var burnHash = await ethChain.contracts.TokenPorter.methods.exportedBurns(burnSequence - 1).call()
+      console.log('burnHash', burnHash)
       var filter = { currentBurnHash: burnHash }
       var options = { filter, fromBlock: 3757156, toBlock: 'latest' }
       let importDataObj = await util.prepareImportData(ethChain, options)
+      let totalSupplybefore = await etcChain.contracts.METToken.methods
+        .totalSupply()
+        .call()
+      console.log('totalSupplybefore', totalSupplybefore)
+      console.log('etcChain.contracts.METToken.options.address', etcChain.contracts.METToken.options.address)
       try {
         await etcChain.contracts.METToken.methods.importMET(
           ethChain.web3.utils.toHex('ETH'),
@@ -119,8 +118,9 @@ describe('Export test. ETH to ETC', () => {
           importDataObj.supplyOnAllChains,
           importDataObj.importData,
           importDataObj.root
-        ).send({ from: etcBuyer })
+        ).send({ from: etcBuyer, gasPrice: 20000000000, gas: 500000 })
         let root = await etcChain.contracts.TokenPorter.methods.merkleRoots(importDataObj.burnHashes[1]).call()
+        console.log('root', root)
         assert.equal(root, importDataObj.root, 'Import request is failed')
         resolve()
       } catch (error) {
@@ -169,8 +169,8 @@ describe('Export test. ETH to ETC', () => {
 
   it('Should be able to export from etc', () => {
     return new Promise(async (resolve, reject) => {
-      fee = ethers.utils.bigNumberify(1e14)
-      amount = ethers.utils.bigNumberify(2e14)
+      fee = ethers.utils.bigNumberify(1e12)
+      amount = ethers.utils.bigNumberify(2e12)
       let totalSupplybefore = await etcChain.contracts.METToken.methods
         .totalSupply()
         .call()
@@ -181,14 +181,14 @@ describe('Export test. ETH to ETC', () => {
       console.log('metBalance', metBalance)
       console.log('totalSupplybefore', totalSupplybefore)
       try {
-        receipt = await etcChain.contracts.METToken.methods.export(
+        await etcChain.contracts.METToken.methods.export(
           ethChain.web3.utils.toHex('ETH'),
           ethChain.contracts.METToken.options.address,
           ethBuyer,
           amount,
           fee,
           ethChain.web3.utils.toHex(extraData)
-        ).send({ from: etcBuyer })
+        ).send({ from: etcBuyer, gasPrice: 20000000000, gas: 500000 })
       } catch (error) {
         return reject(error)
       }
@@ -216,6 +216,7 @@ describe('Export test. ETH to ETC', () => {
       var filter = { currentBurnHash: burnHash }
       var options = { filter, fromBlock: 3757156, toBlock: 'latest' }
       let importDataObj = await util.prepareImportData(etcChain, options)
+      console.log('importDataObj', importDataObj)
       try {
         await ethChain.contracts.METToken.methods.importMET(
           ethChain.web3.utils.toHex('ETC'),
@@ -226,7 +227,7 @@ describe('Export test. ETH to ETC', () => {
           importDataObj.supplyOnAllChains,
           importDataObj.importData,
           importDataObj.root
-        ).send({ from: ethBuyer })
+        ).send({ from: ethBuyer, gasPrice: 20000000000, gas: 500000 })
         let root = await ethChain.contracts.TokenPorter.methods.merkleRoots(importDataObj.burnHashes[1]).call()
         assert.equal(root, importDataObj.root, 'Import request is failed')
         resolve()
@@ -254,7 +255,7 @@ describe('Export test. ETH to ETC', () => {
         .call()
       await validator.attestHash(originChain, returnValues)
       let attstAfter = await ethChain.contracts.Validator.methods.attestationCount(returnValues.currentBurnHash).call()
-      assert.equal(attstAfter, attstBefore + 1, 'attestation failed')
+      assert.equal(attstAfter, '1', 'attestation failed')
 
       let threshold = await ethChain.contracts.Validator.methods.threshold().call()
       if (threshold === '1') {

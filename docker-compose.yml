@@ -1,9 +1,9 @@
 version: '3.2'
 
 services:
-  validator-v3:
-    container_name: validator-v3
-    image: metronome-validator-v3:latest
+  validator:
+    container_name: validator
+    image: metronome-validator:latest
     volumes:
       - /usr/src/metronome-validator/node_modules
       - .:/usr/src/metronome-validator

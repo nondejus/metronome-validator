@@ -29,32 +29,31 @@ const Validator = require('../lib/validator')
 require('dotenv').config()
 
 var ethBuyer = process.env.eth_validator_address
-var ethPassword = process.env.eth_validator_password
 var ethChain, qChain, chains
 
 before(async () => {
   chains = await util.initContracts()
   ethChain = chains.eth
   qChain = chains.qtum
-  // ethChain.web3.eth.personal.unlockAccount(ethBuyer, ethPassword)
   // let owner = await qChain.call(qChain.contracts.Validator, 'owner', [])
-  var destinationChain = await ethChain.contracts.TokenPorter.methods.destinationChains('0x7174756d00000000').call()
-  console.log('destinationChain', destinationChain)
-  // await ethChain.contracts.TokenPorter.methods.addDestinationChain(ethChain.web3.utils.toHex('qtum'), qChain.contracts.METToken.info.address)
-  //   .send({ from: ethBuyer })
-  // let hexAddress = await qChain.qtum.rawCall('gethexaddress', [process.env.qtum_validator_address])
-  // await qChain.send(qChain.contracts.Validator, 'addValidator', [hexAddress], { senderAddress: owner })
+  // var destinationChain = await ethChain.contracts.TokenPorter.methods.destinationChains('0x7174756d00000000').call()
+  // console.log('destinationChain', destinationChain)
+  // // await ethChain.contracts.TokenPorter.methods.addDestinationChain(ethChain.web3.utils.toHex('qtum'), qChain.contracts.METToken.info.address)
+  // //   .send({ from: ethBuyer })
+  // var hexAddress = await qChain.qtum.rawCall('gethexaddress', [process.env.qtum_validator_address])
+  // console.log('hexAddress of ' + process.env.qtum_validator_address, hexAddress)
+  // await qChain.send(qChain.contracts.Validator, 'addValidator', [hexAddress], { from: owner })
 })
 
 describe('Chain hop test cases- ETH to QTUM', () => {
   var metBalance
   var receipt = ''
-  var fee = ethers.utils.bigNumberify(1e14)
+  var fee = ethers.utils.bigNumberify(6e14)
   var amount = ethers.utils.bigNumberify(6e14)
   var extraData = 'D'
 
   before(async () => {
-    await util.getMET(ethChain, ethBuyer)
+    // await util.getMET(ethChain, ethBuyer)
     metBalance = await ethChain.contracts.METToken.methods
       .balanceOf(ethBuyer)
       .call()
@@ -64,14 +63,12 @@ describe('Chain hop test cases- ETH to QTUM', () => {
   })
 
   beforeEach(async () => {
-    ethChain.web3.eth.personal.unlockAccount(ethBuyer, ethPassword)
   })
 
   it('Test case 1: Should be able to export from eth', () => {
     return new Promise(async (resolve, reject) => {
       let recepient = await qChain.qtum.rawCall('gethexaddress', [process.env.qtum_validator_address])
       recepient = '0x' + recepient
-      console.log('qChain.contracts.METToken.info.address', qChain.contracts.METToken.info.address)
       let totalSupplybefore = await ethChain.contracts.METToken.methods
         .totalSupply()
         .call()
@@ -84,7 +81,7 @@ describe('Chain hop test cases- ETH to QTUM', () => {
           amount,
           fee,
           ethChain.web3.utils.toHex(extraData)
-        ).send({ from: ethBuyer })
+        ).send({ from: ethBuyer, gas: 500000 })
       } catch (error) {
         console.log('error', error)
         return reject(error)
@@ -104,18 +101,18 @@ describe('Chain hop test cases- ETH to QTUM', () => {
   it('Test case 2: Should be able to submit import request in qtum', () => {
     return new Promise(async (resolve, reject) => {
       // var burnHash = '0xffc1e6814d4c59b28b11441475cc4a3d276c89f57b16b5c6103a01fc727a19e2'
-      var destChainAddres = await ethChain.contracts.TokenPorter.methods.destinationChains(ethChain.web3.utils.toHex('qtum')).call()
-      console.log('destChainAddres', destChainAddres)
-      console.log('eth tokenPorter', ethChain.contracts.TokenPorter.options.address)
-      console.log('qchain met token address', qChain.contracts.METToken.info.address)
       var burnSequence = await ethChain.contracts.TokenPorter.methods.burnSequence().call()
       console.log('burnSequence', burnSequence)
+      console.log('qChain.contracts.METToken.info.address', qChain.contracts.METToken.info.address)
       var burnHash = await ethChain.contracts.TokenPorter.methods.exportedBurns(burnSequence - 1).call()
-      console.log('burnHash', burnHash)
       var filter = { currentBurnHash: burnHash }
       var options = { filter, fromBlock: 0, toBlock: 'latest' }
       let importDataObj = await util.prepareImportData(ethChain, options)
       console.log('importDataObj', importDataObj)
+      var chainHopStartTime = await qChain.call(qChain.contracts.TokenPorter, 'chainHopStartTime', [])
+      console.log('chainHopStartTime', chainHopStartTime.toString())
+      var chainName = await qChain.call(qChain.contracts.Auctions, 'chain', [])
+      console.log('chainName', chainName)
       try {
         var tx = await qChain.send(qChain.contracts.METToken, 'importMET', [
           ethChain.web3.utils.toHex('ETH'),
@@ -125,13 +122,9 @@ describe('Chain hop test cases- ETH to QTUM', () => {
           importDataObj.burnHashes,
           importDataObj.supplyOnAllChains,
           importDataObj.importData,
-          importDataObj.root],
-        { gas: 38000000, from: process.env.qtum_validator_address }
-        )
+          importDataObj.root], { gas: 38000000 })
         console.log('tx', tx)
         let root = await qChain.call(qChain.contracts.TokenPorter, 'merkleRoots', [importDataObj.burnHashes[1]])
-        root = '0x' + root
-        console.log('root', root)
         assert.equal(root, importDataObj.root, 'Import request is failed')
         resolve()
       } catch (error) {
@@ -150,6 +143,7 @@ describe('Chain hop test cases- ETH to QTUM', () => {
       console.log('initialAuctionEndTime', await ethChain.contracts.Auctions.methods.initialAuctionEndTime().call())
       var burnSequence = await ethChain.contracts.TokenPorter.methods.burnSequence().call()
       var burnHash = await ethChain.contracts.TokenPorter.methods.exportedBurns(burnSequence - 1).call()
+      console.log('burnHash', burnHash)
       var filter = { currentBurnHash: burnHash }
       var options = { filter, fromBlock: 0, toBlock: 'latest' }
       var logExportReceipt = await ethChain.getPastExportReceipts(options)
@@ -166,7 +160,7 @@ describe('Chain hop test cases- ETH to QTUM', () => {
       let attstAfter = await qChain.call(qChain.contracts.Validator, 'attestationCount', [returnValues.currentBurnHash])
       console.log('attstAfter', attstAfter)
       assert(attstAfter, attstBefore + 1, 'attestation failed')
-      let threshold = await qChain.call(qChain.contracts.Validator, 'threshold')
+      let threshold = await qChain.call(qChain.contracts.Validator, 'threshold', [])
       if (threshold.toString() === '1') {
         let hashClaimed = await qChain.call(qChain.contracts.Validator, 'hashClaimed', [returnValues.currentBurnHash])
         assert(hashClaimed, 'Minting failed after attestation')
