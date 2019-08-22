@@ -9,7 +9,7 @@
   },
   "scripts": {
     "postinstall": "patch-package",
-    "docker:build": "docker build -t metronome-validator-v3 .",
+    "docker:build": "docker build -t metronome-validator .",
     "docker-compose:up": " docker-compose -f docker-compose.dev.yml up --force-recreate",
     "test": "npm run testQtumImport && npm run testQtumExport && exit 1",
     "testAC": "./node_modules/.bin/mocha ./test/ac.js --timeout 1000000 && exit",
