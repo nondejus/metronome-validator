@@ -122,7 +122,7 @@ describe('Chain hop test cases- ETH to QTUM', () => {
           importDataObj.burnHashes,
           importDataObj.supplyOnAllChains,
           importDataObj.importData,
-          importDataObj.root], { gas: 38000000 })
+          importDataObj.root], { gas: 380000 })
         console.log('tx', tx)
         let root = await qChain.call(qChain.contracts.TokenPorter, 'merkleRoots', [importDataObj.burnHashes[1]])
         assert.equal(root, importDataObj.root, 'Import request is failed')
