@@ -10,7 +10,6 @@ RUN apt-get install -y nodejs
 
 WORKDIR /usr/src/metronome-validator
 COPY package.json .
-COPY package-lock.json .
 RUN npm install
 COPY . .
 RUN npm run postinstall

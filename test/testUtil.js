@@ -46,19 +46,18 @@ function initContracts () {
     const account = web3.eth.accounts.privateKeyToAccount(wallet.signingKey.privateKey)
     web3.eth.accounts.wallet.add(account)
     web3.eth.defaultAccount = account.address
-    // var provider = new HDWalletProvider(
-    //   config.eth.walletMnemonic,
-    //   config.eth.httpURL, 0, 1, true, "m/44'/60'/0'/0/")
     ethChain = new Chain(config.eth)
     ethChain.createContractObj()
     ethChain.contracts = new MetronomeContracts(web3, config.eth.network)
+
     etcChain = new Chain(config.etc)
-    // provider = new HDWalletProvider(
-    //   config.etc.walletMnemonic,
-    //   config.etc.httpURL, 0, 1, true, "m/44'/60'/0'/0/")
     etcChain.createContractObj()
-    etcChain.contracts = new MetronomeContracts(web3, config.etc.network)
-    qChain = new QChain(config.qtum, metronomeContracts.qtum)
+    // var options = { timeout: 50000000, autoReconnect: true }
+    var etcWeb3 = new Web3(new Web3.providers.HttpProvider(config.etc.httpURL))
+    etcWeb3.eth.accounts.wallet.add(account)
+    etcWeb3.eth.defaultAccount = account.address
+    etcChain.contracts = new MetronomeContracts(etcWeb3, config.etc.network)
+    qChain = new QChain(config.qtum, metronomeContracts.qtum, config.httpURL)
     qChain.createContractObj()
     resolve({
       eth: ethChain,

@@ -29,20 +29,13 @@ const Validator = require('../lib/validator')
 require('dotenv').config()
 
 var recepient = process.env.eth_validator_address
-var password = process.env.eth_validator_password
-var exporter = process.env.qtum_validator_address
-var exporterHexAddress
 
 var ethChain, qChain, chains
 
 before(async () => {
   chains = await util.initContracts()
-  console.log('2')
   ethChain = chains.eth
   qChain = chains.qtum
-  exporterHexAddress = await qChain.qtum.rawCall('gethexaddress', [exporter])
-  // console.log('adding dest chain and validators')
-  // await qChain.send(qChain.contracts.TokenPorter, 'addDestinationChain', [ethChain.web3.utils.toHex('ETH'), ethChain.contracts.METToken.options.address], { senderAddress: exporter })
 })
 
 describe('Chain hop test cases. QTUM to ETH', () => {
@@ -53,20 +46,14 @@ describe('Chain hop test cases. QTUM to ETH', () => {
   var extraData = 'D'
 
   before(async () => {
-    console.log('3')
-    metBalance = await qChain.call(qChain.contracts.METToken, 'balanceOf', [ exporterHexAddress ])
-    console.log('4')
-    assert(metBalance > 0, 'Exporter has no MET token balance')
-    metBalance = ethers.utils.bigNumberify(metBalance.toString())
   })
 
   beforeEach(async () => {
-    ethChain.web3.eth.personal.unlockAccount(recepient, password)
   })
 
   it('Test case 1: Should be able to export from qtum', () => {
     return new Promise(async (resolve, reject) => {
-      let totalSupplybefore = await qChain.call(qChain.contracts.METToken, 'totalSupply')
+      let totalSupplybefore = await qChain.call(qChain.contracts.METToken, 'totalSupply', [])
       totalSupplybefore = ethers.utils.bigNumberify(totalSupplybefore.toString())
       try {
         fee = ethers.utils.bigNumberify(1e14)
@@ -76,12 +63,12 @@ describe('Chain hop test cases. QTUM to ETH', () => {
           recepient,
           amount,
           fee,
-          ethChain.web3.utils.toHex(extraData)], { from: exporter, gas: 10000000 })
+          ethChain.web3.utils.toHex(extraData)], { gas: 380000 })
       } catch (error) {
         console.log('error', error)
         return reject(error)
       }
-      let totalSupplyAfter = await qChain.call(qChain.contracts.METToken, 'totalSupply')
+      let totalSupplyAfter = await qChain.call(qChain.contracts.METToken, 'totalSupply', [])
       totalSupplyAfter = ethers.utils.bigNumberify(totalSupplyAfter.toString())
       amount = ethers.utils.bigNumberify(ethChain.web3.utils.toHex(amount))
       fee = ethers.utils.bigNumberify(ethChain.web3.utils.toHex(fee))
@@ -94,7 +81,7 @@ describe('Chain hop test cases. QTUM to ETH', () => {
 
   it('Test case 2: Should be able to submit import request in eth chain', () => {
     return new Promise(async (resolve, reject) => {
-      var burnSequence = await qChain.call(qChain.contracts.TokenPorter, 'burnSequence')
+      var burnSequence = await qChain.call(qChain.contracts.TokenPorter, 'burnSequence', [])
       var burnHash = await qChain.call(qChain.contracts.TokenPorter, 'exportedBurns', [burnSequence - 1])
       var filter = { currentBurnHash: burnHash }
       var options = { filter, fromBlock: 0, toBlock: 'latest' }
@@ -109,7 +96,7 @@ describe('Chain hop test cases. QTUM to ETH', () => {
           importDataObj.supplyOnAllChains,
           importDataObj.importData,
           importDataObj.root
-        ).send({ from: recepient })
+        ).send({ from: recepient, gas: 500000 })
         let root = await ethChain.contracts.TokenPorter.methods.merkleRoots(importDataObj.burnHashes[1]).call()
         assert.equal(root, importDataObj.root, 'Import request is failed')
         resolve()
@@ -135,7 +122,7 @@ describe('Chain hop test cases. QTUM to ETH', () => {
       let balanceBefore = await ethChain.contracts.METToken.methods
         .balanceOf(returnValues.destinationRecipientAddr)
         .call()
-      await validator.attestHash(originChain, returnValues)
+      await validator.attestHash('QTUM', returnValues)
       let attstAfter = await ethChain.contracts.Validator.methods.attestationCount(returnValues.currentBurnHash).call()
       assert(attstAfter, attstBefore + 1, 'attestation failed')
 
