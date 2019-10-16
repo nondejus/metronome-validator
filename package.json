@@ -8,7 +8,9 @@
     "metronome-validator": "index.js"
   },
   "scripts": {
-    "postinstall": "patch-package",
+    "prepare": "patch-package",
+    "check": "dependency-check . && dependency-check . --unused --no-dev",
+    "check:outdated": "npm-check -i husky",
     "docker:build": "docker build -t metronome-validator .",
     "docker-compose:up": " docker-compose -f docker-compose.dev.yml up --force-recreate",
     "test": "npm run testQtumImport && npm run testQtumExport && exit 1",
@@ -19,7 +21,9 @@
     "eth-to-qtum": "./node_modules/.bin/mocha ./test/eth-to-qtum.js --timeout 1000000 --exit",
     "etc-to-qtum": "./node_modules/.bin/mocha ./test/etc-to-qtum.js --timeout 1000000 --exit",
     "qtum-to-eth": "./node_modules/.bin/mocha ./test/qtum-to-eth.js --timeout 1000000 --exit",
-    "qtum-to-etc": "./node_modules/.bin/mocha ./test/qtum-to-etc.js --timeout 1000000 --exit"
+    "qtum-to-etc": "./node_modules/.bin/mocha ./test/qtum-to-etc.js --timeout 1000000 --exit",
+    "proposal": "node proposal.js",
+    "testproposal": "./node_modules/.bin/mocha ./test/proposal.js --timeout 1000000 --exit"
   },
   "author": "",
   "license": "MIT",
@@ -31,9 +35,14 @@
     "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "mocha": "5.1.0",
+    "patch-package": "5.1.1",
     "bn.js": "^4.11.8",
-    "patch-package": "5.1.1"
+    "husky": "^1.3.1",
+    "mocha": "^6.2.1",
+    "npm-check": "^5.9.0",
+    "nyc": "^14.1.1",
+    "check-tag-matches": "^1.0.0",
+    "dependency-check": "^3.3.0"
   },
   "dependencies": {
     "bluebird": "^3.5.2",
@@ -51,8 +60,8 @@
     "metronome-contracts": "github:patidarmanoj10/metronome-contracts-js",
     "newrelic": "^4.9.0",
     "qtumjs": "^1.9.3",
-    "qtumjs-wallet": "^0.2.1",
-    "qweb3": "^1.2.2",
+    "qtumjs-wallet": "0.2.1",
+    "qtumjs-ethjs-abi": "^1.0.3",
     "redis": "^2.8.0",
     "truffle-hdwallet-provider": "1.0.4",
     "typedarray-to-buffer": "^3.1.5",
