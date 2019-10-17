@@ -14,7 +14,7 @@ patch-package
  };
  class Insight {
      constructor(baseURL) {
-@@ -40,13 +40,13 @@ class Insight {
+@@ -40,16 +40,24 @@ class Insight {
      }
      listUTXOs(address) {
          return __awaiter(this, void 0, void 0, function* () {
@@ -30,7 +30,18 @@ patch-package
              return res.data;
          });
      }
-@@ -62,7 +62,7 @@ class Insight {
++
++    getRecentBlocks(count) {
++        return __awaiter(this, void 0, void 0, function* () {
++            const res = yield this.axios.get(`/recent-blocks?count=${count}`);
++            return res.data;
++        });
++    }
++
+     sendRawTx(rawtx) {
+         return __awaiter(this, void 0, void 0, function* () {
+             const res = yield this.axios.post("/tx/send", {
+@@ -62,7 +70,7 @@ class Insight {
          return __awaiter(this, void 0, void 0, function* () {
              // FIXME wow, what a weird API design... maybe we should just host the RPC
              // server, with limited API exposed.
@@ -39,7 +50,7 @@ patch-package
              return res.data;
          });
      }
-@@ -74,8 +74,8 @@ class Insight {
+@@ -74,8 +82,8 @@ class Insight {
       */
      estimateFee(nblocks = 6) {
          return __awaiter(this, void 0, void 0, function* () {
