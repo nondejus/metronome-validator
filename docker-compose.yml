@@ -9,24 +9,10 @@ services:
       - .:/usr/src/metronome-validator
     network_mode: "service:redis"
     environment:
-      - etc_http_url=${etc_http_url}
-      - qtum_http_url=${qtum_http_url}
-      - qtum_validator_address=${qtum_validator_address}
-      - qtum_network=${qtum_network}
-      - etc_validator_address=${etc_validator_address}
-      - etc_validator_password=${etc_validator_password}
-      - eth_keystore_filename=${eth_keystore_filename}
-      - etc_keystore_filename=${etc_keystore_filename}
-      - etc_ws_url=${etc_ws_url}
-      - eth_http_url=${eth_http_url}
-      - eth_validator_address=${eth_validator_address}
-      - eth_validator_password=${eth_validator_password}
-      - eth_ws_url=${eth_ws_url}
       - REDIS_URL=redis://127.0.0.1:6379/5
       - eth_walletMnemonic=${eth_walletMnemonic}
       - etc_walletMnemonic=${etc_walletMnemonic}
       - qtum_walletMnemonic=${qtum_walletMnemonic}
-      - uselocalkeystore=${uselocalkeystore}
     depends_on: 
       - redis
     restart: always
@@ -38,6 +24,4 @@ services:
     ports:
       - "6379:6379"
     network_mode: host
-    volumes:
-      - ${REDIS_DATA}:/data
     restart: always

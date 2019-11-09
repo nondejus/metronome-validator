@@ -1,0 +1,26 @@
+{
+  "eth": {
+    "httpURL": "eth_http_url",
+    "wsURL": "eth_ws_url",
+    "password": "eth_validator_password",
+    "uselocalkeystore": "eth_uselocalkeystore",
+    "keystore_filename": "eth_keystore_filename",
+    "walletMnemonic": "eth_walletMnemonic",
+    "address": "eth_validator_address"
+  },
+  "etc": {
+    "httpURL": "etc_http_url",
+    "wsURL": "etc_ws_url",
+    "password": "etc_validator_password",
+    "uselocalkeystore": "etc_uselocalkeystore",
+    "keystore_filename": "etc_keystore_filename",
+    "walletMnemonic": "etc_walletMnemonic",
+    "address": "etc_validator_address"
+  },
+  "qtum": {
+    "network": "qtum_network",
+    "httpURL": "qtum_http_url",
+    "walletMnemonic": "qtum_walletMnemonic",
+    "address": "qtum_validator_address"
+  }
+}
