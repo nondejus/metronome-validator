@@ -9,7 +9,6 @@ services:
       - .:/usr/src/metronome-validator
     network_mode: "service:redis"
     environment:
-      - REDIS_URL=redis://127.0.0.1:6379/5
       - eth_walletMnemonic=${eth_walletMnemonic}
       - etc_walletMnemonic=${etc_walletMnemonic}
       - qtum_walletMnemonic=${qtum_walletMnemonic}

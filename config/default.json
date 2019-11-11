@@ -35,5 +35,6 @@
     "host": "logs.papertrailapp.com",
     "port": 31848
   },
-  "synctolerance": 18000
+  "synctolerance": 18000,
+  "redis_url": "redis://127.0.0.1:6379/5"
 }

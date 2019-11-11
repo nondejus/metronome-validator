@@ -22,5 +22,6 @@
     "httpURL": "qtum_http_url",
     "walletMnemonic": "qtum_walletMnemonic",
     "address": "qtum_validator_address"
-  }
+  },
+  "redis_url": "redis_url"
 }
