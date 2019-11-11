@@ -34,7 +34,7 @@ const QChain = require('../lib/qChain')
 var config = require('config')
 const constant = require('../lib/const')
 const Web3 = require('web3')
-require('dotenv').config()
+// require('dotenv').config()
 // create contract object from abi
 function initContracts () {
   return new Promise(async (resolve, reject) => {
@@ -48,6 +48,7 @@ function initContracts () {
     web3.eth.defaultAccount = account.address
     ethChain = new Chain(config.eth)
     ethChain.createContractObj()
+    
     ethChain.contracts = new MetronomeContracts(web3, config.eth.network)
 
     etcChain = new Chain(config.etc)
@@ -77,11 +78,26 @@ function createConfigObj () {
 function preareConfig (chain) {
   config[chain] = { ...config[chain], ...constant[chain] }
   config[chain].chainName = chain
-  config[chain].httpURL = process.env[chain + '_http_url']
-  config[chain].wsURL = process.env[chain + '_ws_url']
-  config[chain].address = process.env[chain + '_validator_address']
-  config[chain].password = process.env[chain + '_validator_password']
-  config[chain].walletMnemonic = process.env[chain + '_walletMnemonic']
+}
+
+const confirm = async (wallet, txid, count = 1) => {
+  console.log('waiting for confirmation', txid)
+  await sleep(45000)
+  while (true) {
+    var txinfo = await wallet.getTransactionInfo(txid)
+    if (!txinfo) {
+      return 'can not fetch tx information'
+    }
+    if (txinfo.confirmations >= count) {
+      console.log('Tx confirmed. Contract address', txinfo.outputs[0].address)
+      return txinfo
+    }
+    await sleep(30000)
+  }
+}
+
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
 // Create account and send some ether in it
@@ -202,4 +218,4 @@ function getMerkleRoot (hashes) {
   return '0x' + tree.getRoot().toString('hex')
 }
 
-module.exports = { initContracts, prepareImportData, getMET, mineBlocks }
+module.exports = { initContracts, prepareImportData, getMET, mineBlocks, confirm }

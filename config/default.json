@@ -1,16 +1,30 @@
 {
   "eth": {
     "confirmationCount": 0,
-    "network": "ropsten"
+    "network": "ropsten",
+    "httpURL": "https://ropsten.met.bloqrock.net:8545",
+    "wsURL": "wss://ropsten.met.bloqrock.net:8546",
+    "password": "",
+    "uselocalkeystore": "no",
+    "keystore_filename": "",
+    "walletMnemonic": ""
   },
   "etc": {
     "confirmationCount": 0,
-    "network": "mordor"
+    "network": "mordor",
+    "httpURL": "https://mordor.met.bloqrock.net:8545",
+    "wsURL": "wss://mordor.met.bloqrock.net:8546",
+    "password": "",
+    "uselocalkeystore": "no",
+    "keystore_filename": "",
+    "walletMnemonic": ""
   },
   "qtum": {
     "confirmationCount": 0,
     "networkAlias": "qtumTestnet",
-    "network": "testnet"
+    "network": "testnet",
+    "httpURL": "http://qtum:test@3.232.126.136:3889",
+    "walletMnemonic": ""
   },
   "newrelic": {
     "appName": "metronome-validator-testnet",
@@ -21,5 +35,7 @@
     "host": "logs.papertrailapp.com",
     "port": 31848
   },
-  "synctolerance": 18000 
+  "synctolerance": 18000,
+  "redis_url": "redis://127.0.0.1:6379/5",
+  "destConfirmCount": "0"
 }
