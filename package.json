@@ -1,6 +1,6 @@
 {
   "name": "metronome-validator",
-  "version": "2.4.1",
+  "version": "2.4.3",
   "description": "Metronome off chain validators",
   "main": "index.js",
   "preferGlobal": true,
