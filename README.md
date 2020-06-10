@@ -3,15 +3,17 @@
 Metronome off chain validators to validate export receipt and attest the same in destination chain.
 
 ### Prerequisites
-1. Full Synced Parity or Geth node. 
+1. Full Synced ETH and ETC node.
 2. Docker 
 3. Validator's address must be added as whitelist validators in smart contract. 
 4. Must have ether to pay for gas cost of attestation
 
 ### Setup & Installing 
 <b>Testnet and Mainet:</b>
-1. Create metronome validators. using command docker build -t metronome-validator 
-2. Set env variables
+1. Create metronome validators image using command below command.
+      
+      docker build -t metronome-validator 
+2. Set following env variables
 
       eth_http_url=\<ETH node http url:port>
 
@@ -25,19 +27,14 @@ Metronome off chain validators to validate export receipt and attest the same in
       
       etc_validator_address=\<address>
       
-      One of below to sign transaction.
-
-      a) walletMnemonic=\<mnemonic phrase>
+      walletMnemonic=\<mnemonic phrase>
      
-      One mnomic phrase can be used for both eth, etc. For more information refer link https://iancoleman.io/bip39 . generate phrase and use correct address in etc_validator_address, eth_validator_address
+3. Generate mnemonic phrase using offline script available [here](https://github.com/autonomoussoftware/mnemonic-generator). Use the address in etc_validator_address, eth_validator_address. One mnemonic phrase can be used for both eth, etc. For more information about mnomeinic phrase refer link https://iancoleman.io/bip39. 
     
-      or
-      
-      b) etc_validator_password=\<password>
    
-      eth_validator_password=\<password>
-   
-4. docker-compose up
+4. Execute below command to run validator container 
+
+      docker-compose up
 
 ### License 
 MIT
